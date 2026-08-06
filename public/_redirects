@@ -1,0 +1,4 @@
+# Netlify / Cloudflare Pages SPA fallback.
+# Without this, a hard refresh on /services returns a 404 because the file does
+# not physically exist — the client-side router owns that path.
+/*    /index.html   200

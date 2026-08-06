@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Studio monogram">
+  <title>Studio monogram</title>
+  <!--
+    FAVICON PLACEHOLDER
+    Replace this file with the client's own icon, keeping the filename
+    `favicon.svg` so index.html and the manifest need no edit.
+    To keep this mark and change only the letter, edit the text element below.
+    Then run: node __icons.mjs   (regenerates the PNG sizes)
+    Colours are the config defaults: #1A1917 contrast, #B8860B accent.
+  -->
+  <rect width="64" height="64" rx="4" fill="#1A1917" />
+  <rect x="5.5" y="5.5" width="53" height="53" rx="2" fill="none" stroke="#B8860B" stroke-opacity="0.55" />
+  <text
+    x="32"
+    y="43"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="32"
+    fill="#B8860B"
+  >A</text>
+</svg>

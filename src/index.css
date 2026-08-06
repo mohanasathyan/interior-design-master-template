@@ -1,0 +1,589 @@
+@import 'tailwindcss';
+
+/**
+ * ============================================================================
+ * DESIGN TOKENS
+ * ============================================================================
+ * These are the *defaults*. At runtime `ThemeProvider` writes the values from
+ * `site.config.ts` over the top as inline custom properties on <html>, so the
+ * config always wins. Keeping defaults here means the page is correctly themed
+ * on the very first paint, before React hydrates.
+ *
+ * Tailwind v4 generates utilities straight from this block:
+ *   --color-canvas  →  bg-canvas / text-canvas / border-canvas
+ *   --font-display  →  font-display
+ * ============================================================================
+ */
+@theme {
+  /* ---- Brand palette ---- */
+  --color-canvas: #faf8f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f1ec;
+  --color-ink: #222222;
+  --color-ink-muted: #666666;
+  --color-accent: #b8860b;
+  /*
+   * Gold as TYPE on light surfaces. The brand gold reaches only ~3:1 against
+   * the canvas — fine for fills, borders and icons (WCAG 1.4.11 non-text),
+   * but a failure for normal-size text (1.4.3 needs 4.5:1). This darkened
+   * variant measures 4.9:1 on canvas and 5.3:1 on white.
+   * Rule of thumb: `text-accent-strong` on light, `text-accent` on dark.
+   */
+  --color-accent-strong: #8a6508;
+  /*
+   * Solid gold fills that carry a white label (primary buttons, active chips).
+   * Deeper than the brand gold so white text clears AA — see site.config.ts.
+   */
+  --color-accent-button: #966d0a;
+  --color-accent-hover: #7e5c07;
+  --color-accent-contrast: #ffffff;
+  --color-border: #ececec;
+  --color-contrast: #1a1917;
+  --color-contrast-ink: #f5f1ea;
+
+  /* ---- Typography ---- */
+  --font-display: 'Playfair Display', 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ---- Editorial type scale (fluid, clamps between mobile and desktop) ---- */
+  --text-display: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-h1: clamp(2.25rem, 1.4rem + 3.6vw, 4.25rem);
+  --text-h1--line-height: 1.06;
+  --text-h1--letter-spacing: -0.025em;
+
+  --text-h2: clamp(1.875rem, 1.3rem + 2.4vw, 3.125rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.02em;
+
+  --text-h3: clamp(1.375rem, 1.1rem + 1.1vw, 1.875rem);
+  --text-h3--line-height: 1.22;
+  --text-h3--letter-spacing: -0.012em;
+
+  --text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
+  --text-lead--line-height: 1.7;
+
+  /* ---- Motion ---- */
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Structure ---- */
+  --radius-brand: 2px;
+
+  /*
+   * ---- Elevation ----
+   * Two shadows, and only two. Every raised surface on the site is either a
+   * card lifting on hover (`lift`) or something floating above the page such
+   * as a dropdown or a modal (`float`).
+   *
+   * The large negative spread is the whole trick: it pulls the shadow in so
+   * only a wide, very soft pool is left under the element. A luxury interior
+   * is lit, not outlined — a tight dark edge reads as a UI kit.
+   *
+   * These are `--shadow-*` in the `@theme` block, so Tailwind generates
+   * `shadow-lift` and `shadow-float` from them automatically.
+   */
+  --shadow-lift: 0 26px 64px -36px rgb(34 34 34 / 0.34);
+  --shadow-float: 0 24px 60px -28px rgb(34 34 34 / 0.35);
+
+  /*
+   * ---- The metallic gold action ----
+   *
+   * Every stop is DERIVED from `--color-accent` with `color-mix`, never
+   * hard-coded. Change the brand gold in `site.config.ts` and the whole ramp,
+   * both shadows and the highlight follow it — which is the only way a
+   * gradient belongs in a template that gets recoloured per client.
+   *
+   * What makes it read as metal rather than as a yellow box is the pairing of
+   * a light top stop with the `inset` hairline: a single line of light along
+   * the top edge, the way a brushed surface catches a room. It is a highlight,
+   * not a glow — there is no bloom outside the element's own edge.
+   *
+   * The ramp bottoms out at 94% of the accent, and that number is a floor, not
+   * a preference: the label is `--color-contrast` (#1a1917) and at 94% it
+   * measures 4.82:1. Push the bottom to 90% and it falls to 4.48:1, under AA.
+   * With the lighter `--color-ink` (#222222) label the same stop measures only
+   * 4.37:1 and fails outright — which is why the label is the darker of the
+   * two, not merely because it looks richer.
+   */
+  --gradient-gold: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent) 80%, white) 0%,
+    var(--color-accent) 52%,
+    color-mix(in srgb, var(--color-accent) 94%, black) 100%
+  );
+
+  /*
+   * Resting and lifted. Both are wide and soft and tinted with the gold
+   * itself, so the button sits in warm light rather than on a grey drop
+   * shadow. The `inset` line is repeated in each so it survives the swap.
+   */
+  --shadow-gold:
+    0 6px 18px -8px color-mix(in srgb, var(--color-accent) 55%, transparent),
+    0 1px 2px rgb(0 0 0 / 0.12),
+    inset 0 1px 0 color-mix(in srgb, white 38%, transparent);
+  --shadow-gold-lift:
+    0 16px 32px -10px color-mix(in srgb, var(--color-accent) 62%, transparent),
+    0 3px 6px rgb(0 0 0 / 0.14),
+    inset 0 1px 0 color-mix(in srgb, white 46%, transparent);
+
+  /* ---- Breakpoint for very wide editorial layouts ---- */
+  --breakpoint-3xl: 96rem;
+}
+
+/**
+ * ============================================================================
+ * BASE
+ * ============================================================================
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky navbar never covers a heading. */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01';
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* A single, unmistakable focus treatment across the whole site (WCAG 2.4.7) */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* Never show a focus ring for pointer users, always show it for keyboard */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Slim, unobtrusive scrollbar that matches the palette */
+  @supports (scrollbar-width: thin) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--color-ink) 22%, transparent) transparent;
+    }
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* Kill the yellow autofill wash that breaks the luxury palette */
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/**
+ * ============================================================================
+ * COMPONENT PRIMITIVES
+ * ============================================================================
+ * Small, reusable pieces of visual language used across many components.
+ */
+@layer components {
+  /* The small uppercase label that sits above every section heading. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    /* 11px uppercase type — needs the AA-safe gold, not the brand gold. */
+    color: var(--color-accent-strong);
+  }
+
+  /* On dark bands the brand gold has ample contrast, so it is used as-is. */
+  .eyebrow--light {
+    color: var(--color-accent);
+  }
+
+  /* A 32px hairline used as a typographic flourish beside eyebrows. */
+  .eyebrow::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background-color: currentColor;
+    opacity: 0.5;
+  }
+
+  .eyebrow--center::before {
+    display: none;
+  }
+
+  /* Text link with an underline that wipes in from the left. */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.5s var(--ease-luxe);
+  }
+
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* Reverse: underline is present and wipes away on hover (used in the nav). */
+  .link-wipe::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  .link-wipe:hover::after {
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+
+  /* Full-bleed hairline divider. */
+  .hairline {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-ink) 12%, transparent),
+      transparent
+    );
+  }
+
+  /* Editorial drop-cap for the founder's letter. */
+  .drop-cap::first-letter {
+    font-family: var(--font-display);
+    font-size: 3.6em;
+    line-height: 0.82;
+    float: left;
+    padding-right: 0.09em;
+    padding-top: 0.06em;
+    color: var(--color-accent);
+  }
+
+  /* Hides a scrollbar while keeping the element scrollable (mobile chip rows). */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Softly fades the bottom of an element into the page. */
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  /*
+   * For any element rendering a raw config value.
+   *
+   * Unfilled placeholders are single unbreakable words — `{{TIMELINE_RESIDENTIAL}}`
+   * is 24 characters with no space in it — and a browser will happily push one
+   * straight out of its grid or flex track, over whatever sits beside it. Real
+   * values ("6–8 weeks") never do this, so the overflow only appears while the
+   * template is unfilled: exactly the state a prospect is shown it in.
+   *
+   * `anywhere` rather than `break-word` because `break-word` still reserves the
+   * full intrinsic width when calculating the track size, so a grid column would
+   * stay too wide and the neighbour would still be squeezed.
+   */
+  .token-safe {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
+
+/**
+ * ============================================================================
+ * UTILITIES
+ * ============================================================================
+ */
+
+/* Skip-to-content link — visible only when focused by keyboard. */
+@utility skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  transform: translateY(-160%);
+  transition: transform 0.3s var(--ease-snap);
+}
+
+@utility grain {
+  position: relative;
+}
+
+/* A barely-there film grain that stops large flat areas looking digital. */
+@utility grain-overlay {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/**
+ * ============================================================================
+ * KEYFRAMES
+ * ============================================================================
+ */
+
+/* Radix Accordion — animates to the measured content height. */
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* Radix Dialog — scrim fade and a restrained lift for the panel. */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.985);
+  }
+}
+
+/* Radix Select — content fades and lifts into place. */
+@keyframes select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The slow vertical drift applied to the hero image (Ken Burns, but tasteful). */
+/*
+ * The hero's slow drift.
+ *
+ * It starts at scale(1) deliberately. The previous 1.06→1.14 range meant the
+ * approved composition was never actually on screen — the photograph was
+ * permanently cropped by 6–14%, and the brief for this image was explicit that
+ * the framing is not to be changed. Beginning at 1 shows the delivered crop
+ * exactly, and 1.045 at the far end is small enough that nothing at the edges
+ * is lost in any meaningful sense.
+ *
+ * Remove `animate-[slow-pan…]` in Hero.tsx if the framing must be pixel-static.
+ */
+@keyframes slow-pan {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.045) translate3d(0, -0.8%, 0);
+  }
+}
+
+/* The scroll-cue line that travels down its track. */
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  55% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/*
+ * Route-loading spinner. Two animations on one element: a 400ms-delayed fade
+ * so a fast chunk load never flashes it, then the spin itself. Reduced motion
+ * is handled by the global block below, which caps iteration count — the
+ * element still fades in, it simply stops rotating.
+ */
+@keyframes appear-late {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-appear-late {
+  opacity: 0;
+  animation:
+    appear-late 0.3s var(--ease-luxe) 0.4s forwards,
+    spin 0.9s linear 0.4s infinite;
+}
+
+/* Marquee used by the credentials strip. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/**
+ * ============================================================================
+ * ACCESSIBILITY — REDUCED MOTION
+ * ============================================================================
+ * Respect the OS-level preference. Content still appears; it simply stops
+ * moving. Note that `opacity` transitions are preserved deliberately — a hard
+ * cut is more disorienting than a fade for many vestibular users.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.12s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: strip the furniture, keep the contact details. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

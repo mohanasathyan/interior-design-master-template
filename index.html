@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!--
+      ==========================================================================
+      METADATA
+      --------------------------------------------------------------------------
+      The marker below is replaced at build time (and in dev) by the Vite plugin
+      in vite.config.ts, using the values in src/config/site.config.ts:
+
+        title · description · robots · canonical · theme-color
+        Open Graph · Twitter · image-CDN preconnect · hero preload
+
+      It is baked into the static HTML because social scrapers do not run
+      JavaScript — without this, every shared link would preview raw {{TOKENS}}.
+      At runtime the <Seo /> component then keeps the same tags per-route.
+
+      You never edit this file when cloning. Edit site.config.ts.
+      ==========================================================================
+    -->
+    <!-- SEO:INJECT -->
+
+    <!-- Favicons — replace the files in /public, keep the filenames -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      Fonts. Preconnect first, then load the stylesheet without blocking render:
+      `media="print"` makes the browser fetch it at low priority and skip
+      applying it, and the onload handler promotes it once it has arrived.
+      `display=swap` means text is readable throughout.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+      />
+    </noscript>
+
+    <!--
+      Critical shell styles. Painted before the app bundle evaluates so the very
+      first frame already shows the brand canvas colour instead of a white flash.
+    -->
+    <style>
+      html {
+        background-color: #faf8f5;
+        -webkit-text-size-adjust: 100%;
+      }
+      #root {
+        min-height: 100svh;
+      }
+      /* Boot splash — removed by the app on first paint */
+      .boot-splash {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: #faf8f5;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+      .boot-splash__mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #ececec;
+        border-top-color: #b8860b;
+        animation: boot-spin 0.9s linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-splash__mark {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="boot-splash" id="boot-splash" aria-hidden="true">
+        <div class="boot-splash__mark"></div>
+      </div>
+    </div>
+
+    <noscript>
+      <div style="padding: 3rem; font-family: system-ui, sans-serif; color: #222">
+        <p>
+          This website needs JavaScript to display fully. Please call or email our design studio and
+          we will be glad to help.
+        </p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
