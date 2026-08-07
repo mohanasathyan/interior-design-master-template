@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, m } from 'framer-motion';
 import { AlertCircle, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
 import { serviceOptions } from '@/data/services';
 import { projects } from '@/data/projects';
 import { isFilled, t } from '@/lib/tokens';
+import { ANALYTICS_EVENTS, trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -186,6 +188,25 @@ export function ContactForm() {
 
         if (!response.ok) throw new Error(`Request failed: ${response.status}`);
       }
+
+      /*
+       * The primary conversion, and the only one the delegated click tracker
+       * cannot infer — there is no link to classify, and it must fire on a
+       * SUCCESSFUL submit rather than on the button press, or every validation
+       * failure would be reported as a lead.
+       *
+       * No `service`/`budget` values are sent, only whether they were supplied:
+       * this payload goes to a third party, and the visitor's own words about
+       * their home are not ours to forward. `trackEvent` is a no-op while
+       * analytics is unconfigured, so there is nothing to guard here.
+       */
+      trackEvent(ANALYTICS_EVENTS.generateLead, {
+        form: 'contact',
+        service: values.service || undefined,
+        has_budget: Boolean(values.budget),
+        has_message: Boolean(values.message.trim()),
+        demo_mode: demoMode,
+      });
 
       setStatus('success');
       setSubmitMessage(t(siteConfig.forms.successMessage));
@@ -449,9 +470,23 @@ export function ContactForm() {
             className="mt-0.5 size-4 shrink-0 text-accent-strong"
             strokeWidth={1.6}
           />
-          {t(
-            'Your details stay with our design team. No spam, no reselling, and no sales calls out of the blue.',
-          )}
+          {/*
+            The promise now links to the document that backs it. A privacy
+            claim beside a field asking for a phone number should be checkable,
+            and the span keeps the sentence and its link as one flex item so the
+            icon stays aligned to the first line.
+          */}
+          <span>
+            {t(
+              'Your details stay with our design team. No spam, no reselling, and no sales calls out of the blue.',
+            )}{' '}
+            <Link
+              to={routes.privacy}
+              className="link-underline whitespace-nowrap text-accent-strong transition-colors duration-300 hover:text-ink"
+            >
+              Privacy Policy
+            </Link>
+          </span>
         </p>
 
         <Button

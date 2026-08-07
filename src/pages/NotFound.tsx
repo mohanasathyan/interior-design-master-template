@@ -9,6 +9,7 @@ import { Container } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Img } from '@/components/common/Img';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -79,7 +80,7 @@ export default function NotFound() {
             <Reveal preset="up" delay={0.22}>
               <div className="mt-11 flex flex-col gap-3.5 sm:flex-row">
                 <Button asChild size="lg">
-                  <Link to="/">
+                  <Link to={routes.home}>
                     <Home className="size-4" strokeWidth={1.7} />
                     Back to Home
                   </Link>

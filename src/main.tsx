@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import './index.css';
 
 /**
@@ -17,8 +18,16 @@ if (!container) {
   throw new Error('Root element #root was not found in index.html');
 }
 
+/*
+ * The boundary wraps `<App />` rather than sitting inside it, so it also covers
+ * the providers — `LazyMotion`, `ThemeProvider`, `BrowserRouter`. A boundary
+ * mounted below those cannot catch a failure in them, and it is the outermost
+ * layers that leave the boot splash stranded on screen when they throw.
+ */
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>,
 );

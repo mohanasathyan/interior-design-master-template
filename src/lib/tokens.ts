@@ -51,7 +51,7 @@ export function isFilled(value: string | null | undefined): value is string {
 let registry: Record<string, string> | null = null;
 
 function buildRegistry(): Record<string, string> {
-  const { business, contact, location, seo, brand } = siteConfig;
+  const { business, contact, location, seo, brand, facts } = siteConfig;
 
   return {
     BUSINESS_NAME: business.name,
@@ -61,6 +61,10 @@ function buildRegistry(): Record<string, string> {
     MONOGRAM: brand.monogram,
     GOOGLE_RATING: business.rating,
     REVIEW_COUNT: business.reviewCount,
+
+    FOUNDER_NAME: business.founder.name,
+    FOUNDER_ROLE: business.founder.role,
+    FOUNDER_CREDENTIAL: business.founder.credential,
 
     PHONE: contact.phone,
     PHONE_ALT: contact.phoneAlt,
@@ -76,9 +80,36 @@ function buildRegistry(): Record<string, string> {
 
     SITE_URL: seo.siteUrl,
 
+    WARRANTY_YEARS: facts.warrantyYears,
+    PRICE_STARTING: facts.priceStarting,
+    PRICE_FULL_HOME: facts.priceFullHome,
+    TIMELINE_ROOM: facts.timelineRoom,
+    TIMELINE_HOME: facts.timelineHome,
+    TIMELINE_DESIGN: facts.timelineDesign,
+
     /** Derived, always available — handy for freshness signals in copy. */
     CURRENT_YEAR: String(new Date().getFullYear()),
+    CURRENT_SEASON: currentSeason(),
   };
+}
+
+/**
+ * Meteorological season for the current month, Northern hemisphere.
+ *
+ * Derived rather than configured, for the same reason as `CURRENT_YEAR`: a
+ * seasonal line in the announcement bar is a freshness signal, and a freshness
+ * signal that has to be remembered and updated by hand is one that goes stale.
+ *
+ * Southern-hemisphere or monsoon-calendar clients should not fight this —
+ * `features.announcementText` is ordinary editable copy, so write the season
+ * into the sentence directly and drop the token.
+ */
+function currentSeason(): string {
+  const month = new Date().getMonth(); // 0 = January
+  if (month <= 1 || month === 11) return 'Winter';
+  if (month <= 4) return 'Spring';
+  if (month <= 7) return 'Summer';
+  return 'Autumn';
 }
 
 function getRegistry(): Record<string, string> {
@@ -87,12 +118,21 @@ function getRegistry(): Record<string, string> {
 }
 
 /**
- * Interpolate `{{TOKENS}}` inside a string using the config registry.
+ * Every token key the registry knows how to resolve.
  *
- * @example
- *   t('Interiors for {{CITY}} homes') // → 'Interiors for Bengaluru homes'
+ * Exported for the build-time validator in `vite.config.ts`, which uses it to
+ * prove that no string of copy references a token that can never be filled in.
+ * Values are irrelevant here — only the set of keys.
  */
-export function t(input: string): string {
+export function tokenKeys(): string[] {
+  return Object.keys(getRegistry());
+}
+
+/**
+ * The substitution itself. Shared by `t` and `tClean` so there is exactly one
+ * implementation of "what does this token resolve to".
+ */
+function interpolate(input: string): string {
   if (!input.includes('{{')) return input;
 
   const table = getRegistry();
@@ -103,6 +143,86 @@ export function t(input: string): string {
     if (value === undefined || isPlaceholder(value)) return match;
     return value;
   });
+}
+
+/**
+ * True only under `vite dev`.
+ *
+ * ⚠️ `import.meta.env` MUST be written out literally here.
+ *
+ * Vite resolves it by static TEXT replacement, not at runtime, so assigning it
+ * to a local first — `const meta = import.meta; meta.env?.DEV` — leaves nothing
+ * for Vite to match. The expression then evaluates to `undefined` in the dev
+ * server too, `t()` silently takes its production path, and unfilled tokens
+ * stop being visible during review: the exact affordance this function exists
+ * to protect, disabled by the check meant to protect it.
+ *
+ * The `?.` and the `try` are for the other consumer: this module is also
+ * imported by `vite.config.ts`, which runs in Node where there is no
+ * `import.meta.env` at all. Both degrade to `false`, which is the correct
+ * answer in a build context.
+ */
+function isDevRuntime(): boolean {
+  try {
+    return import.meta.env?.DEV === true;
+  } catch {
+    return false;
+  }
+}
+
+/** Warn once per token per session, so a re-render cannot flood the console. */
+const warned = new Set<string>();
+
+function warnUnresolved(source: string): void {
+  if (!isDevRuntime()) return;
+
+  for (const [, key] of source.matchAll(EMBEDDED_TOKEN)) {
+    if (warned.has(key)) continue;
+    warned.add(key);
+    console.warn(
+      `[tokens] {{${key}}} could not be resolved.\n` +
+        `  In development it stays visible so it cannot ship unnoticed.\n` +
+        `  In a production build it is stripped, and \`npm run build\` fails if\n` +
+        `  the token has no home in site.config.ts at all.\n` +
+        `  Fix: fill the matching field in src/config/site.config.ts, or add the\n` +
+        `  key to the registry in src/lib/tokens.ts if it is a new one.`,
+    );
+  }
+}
+
+/**
+ * Interpolate `{{TOKENS}}` inside a string using the config registry.
+ *
+ * @example
+ *   t('Interiors for {{CITY}} homes') // → 'Interiors for Bengaluru homes'
+ *
+ * ---------------------------------------------------------------------------
+ * WHAT HAPPENS TO A TOKEN THAT DOES NOT RESOLVE
+ * ---------------------------------------------------------------------------
+ * It depends on where you are, and the difference is the point:
+ *
+ *   DEVELOPMENT  it stays visible, exactly as before, and logs a one-time
+ *                console warning. An unfilled field must be impossible to miss
+ *                during a client review — that is the whole reason the token
+ *                system renders them rather than hiding them.
+ *
+ *   PRODUCTION   it is stripped and the surrounding punctuation tidied, via the
+ *                same `cleanup` the metadata path has always used. A live site
+ *                shows slightly shorter copy instead of `{{FOUNDER_NAME}}`.
+ *
+ * This is a safety net, not the mechanism. The real guarantee is the build-time
+ * validator in `vite.config.ts`, which fails the build when copy references a
+ * token that has no home in the config at all — the one class of failure a
+ * client can never fix by filling anything in.
+ */
+export function t(input: string): string {
+  if (!input.includes('{{')) return input;
+
+  const output = interpolate(input);
+  if (!output.includes('{{')) return output;
+
+  warnUnresolved(output);
+  return isDevRuntime() ? output : cleanup(output);
 }
 
 /** Interpolate every string in an array. */
@@ -130,7 +250,18 @@ const DANGLING_HEAD = /^[\s]*[—–\-|·,:][\s]*/;
  *     → this function: "Luxury Interior Design"
  */
 export function tClean(input: string): string {
-  let output = t(input)
+  return cleanup(interpolate(input));
+}
+
+/**
+ * Strip whatever tokens are left and repair the punctuation around the hole.
+ *
+ * Split out of `tClean` so `t`'s production path can reuse it. It deliberately
+ * takes an ALREADY-interpolated string and never calls `t` itself — `t` calls
+ * this, so the two would otherwise recurse into each other.
+ */
+function cleanup(interpolated: string): string {
+  let output = interpolated
     .replace(EMBEDDED_TOKEN, '')
     .replace(/\s{2,}/g, ' ')
     .replace(/\s+([.,!?;:])/g, '$1')

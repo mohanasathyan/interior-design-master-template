@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { siteConfig } from '@/config/site.config';
 import { t } from '@/lib/tokens';
 import { Container } from '@/components/common/Section';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -41,7 +42,7 @@ export function AnnouncementBar({ collapsed }: { collapsed: boolean }) {
           <Container>
             <div className="relative flex items-center justify-center gap-4 py-2.5">
               <Link
-                to="/contact"
+                to={routes.contact}
                 className="group inline-flex items-center gap-2.5 text-center text-[0.7rem] font-medium tracking-[0.1em] text-contrast-ink/85 transition-colors duration-300 hover:text-accent sm:text-[0.74rem]"
               >
                 <span aria-hidden="true" className="hidden size-1.5 rounded-full bg-accent sm:block" />

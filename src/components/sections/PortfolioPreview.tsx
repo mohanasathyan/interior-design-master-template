@@ -9,6 +9,7 @@ import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Button } from '@/components/ui/button';
 import { ProjectCard } from './ProjectCard';
 import { ProjectDialog } from './ProjectDialog';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -40,7 +41,7 @@ export function PortfolioPreview() {
 
         <Reveal preset="up" delay={0.15} className="shrink-0">
           <Button asChild variant="outline" size="md">
-            <Link to="/projects">
+            <Link to={routes.projects}>
               View All {projects.length} Projects
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
@@ -72,10 +73,10 @@ export function PortfolioPreview() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link to="/contact">Discuss Your Project</Link>
+              <Link to={routes.contact}>Discuss Your Project</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/projects">Browse the Full Gallery</Link>
+              <Link to={routes.projects}>Browse the Full Gallery</Link>
             </Button>
           </div>
         </div>

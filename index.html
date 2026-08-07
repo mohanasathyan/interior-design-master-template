@@ -84,6 +84,47 @@
           transform: rotate(360deg);
         }
       }
+      /*
+        CSS-ONLY DEAD-MAN'S SWITCH.
+
+        The React error boundary retires this splash the moment a render throws,
+        which covers every failure inside the app. It cannot cover the failure
+        that happens BEFORE the app: a bundle that 404s after a redeploy, a
+        parse error, a blocked script, a network that dies mid-download. In
+        those cases no JavaScript of ours ever runs, and without this the
+        visitor watches a spinner turn forever.
+
+        So the escape hatch is pure CSS and needs nothing to be working. It is
+        laid out absolutely so the reserved space cannot nudge the spinner
+        while it is hidden, and the whole splash — message included — is removed
+        by `ThemeProvider` the instant the app does mount, so a merely slow
+        connection never leaves it stranded on a healthy page.
+      */
+      .boot-splash__fallback {
+        position: absolute;
+        left: 50%;
+        bottom: 22%;
+        transform: translateX(-50%);
+        width: min(30rem, calc(100% - 3rem));
+        margin: 0;
+        text-align: center;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: #666666;
+        opacity: 0;
+        visibility: hidden;
+        animation: boot-fallback-in 0.4s ease 10s forwards;
+      }
+      .boot-splash__fallback a {
+        color: #8a6508;
+      }
+      @keyframes boot-fallback-in {
+        to {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
       @media (prefers-reduced-motion: reduce) {
         .boot-splash__mark {
           animation: none;
@@ -93,8 +134,12 @@
   </head>
   <body>
     <div id="root">
-      <div class="boot-splash" id="boot-splash" aria-hidden="true">
-        <div class="boot-splash__mark"></div>
+      <div class="boot-splash" id="boot-splash">
+        <div class="boot-splash__mark" aria-hidden="true"></div>
+        <p class="boot-splash__fallback">
+          This is taking longer than expected.
+          <a href="/">Reload the page</a>
+        </p>
       </div>
     </div>
 

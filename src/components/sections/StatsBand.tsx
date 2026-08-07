@@ -8,6 +8,7 @@ import { Section, SectionHeading } from '@/components/common/Section';
 import { RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Stat } from '@/components/common/Stat';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -39,7 +40,7 @@ export function StatsBand() {
             maxWidth="max-w-xl"
           >
             <Button asChild variant="outline" size="md">
-              <Link to="/about">
+              <Link to={routes.about}>
                 Read Our Story
                 <ArrowRight
                   className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
 import { siteConfig } from './src/config/site.config';
-import { tClean, isFilled } from './src/lib/tokens';
+import { tClean, isFilled, tokenKeys } from './src/lib/tokens';
 import {
   IMAGE_CDN_ORIGIN,
   buildSrcSet,
@@ -208,6 +208,198 @@ function seoHtmlPlugin(): Plugin {
   };
 }
 
+/**
+ * ============================================================================
+ * TOKEN VALIDATION
+ * ============================================================================
+ * The template ships deliberately full of `{{TOKENS}}` — that is the product.
+ * So "the build must contain no tokens" would be the wrong rule. There are two
+ * kinds, and only one of them is a defect:
+ *
+ *   FILLABLE      the token IS the whole value of a config or data field:
+ *                   year: '{{MILESTONE_1_YEAR}}'
+ *                 The client replaces the string and it is done. Legitimate,
+ *                 and the normal state of an unfilled template.
+ *
+ *   UNRESOLVABLE  the token is embedded inside a longer sentence:
+ *                   'Portrait of {{FOUNDER_NAME}}, founder of {{BUSINESS_NAME}}'
+ *                 There is nothing to replace — the only way it can ever render
+ *                 is through the registry in `src/lib/tokens.ts`. If the key is
+ *                 not registered, NO amount of configuring will ever fill it,
+ *                 and the raw `{{FOUNDER_NAME}}` ships to the live site.
+ *
+ * The second kind is invisible in review precisely because the first kind is
+ * everywhere and looks identical. So it is checked mechanically here: every
+ * embedded token must have a registry key. That is the whole rule.
+ *
+ * It runs over Vite's own module graph rather than a directory glob, so it sees
+ * exactly the source that is actually bundled — no stale files, no `node_modules`.
+ */
+
+/** Matches an embedded placeholder within a longer string. */
+const TOKEN_PATTERN = /\{\{([A-Z0-9_]+)\}\}/g;
+/** Matches a string whose entire content is one placeholder — a fillable field. */
+const WHOLE_TOKEN_PATTERN = /^\s*\{\{[A-Z0-9_]+\}\}\s*$/;
+
+interface TokenViolation {
+  key: string;
+  file: string;
+  line: number;
+  excerpt: string;
+}
+
+/**
+ * Extract the contents of every string and template literal, skipping comments.
+ *
+ * A scanner rather than a regex because comments are full of illustrative
+ * `{{TOKEN}}` examples in this codebase, and flagging documentation as a defect
+ * would make the check something people switch off.
+ *
+ * A regex literal containing a lone quote (`/"/g`) can still mis-slice the
+ * source. That is accepted: the slice would have to coincidentally contain
+ * `{{KEY}}` to matter, and the check is a safety net rather than a compiler.
+ */
+function stringLiterals(source: string): { text: string; line: number }[] {
+  const found: { text: string; line: number }[] = [];
+  let index = 0;
+  let line = 1;
+  const length = source.length;
+
+  while (index < length) {
+    const char = source[index];
+
+    if (char === '\n') { line++; index++; continue; }
+    if (char === '/' && source[index + 1] === '/') {
+      while (index < length && source[index] !== '\n') index++;
+      continue;
+    }
+    if (char === '/' && source[index + 1] === '*') {
+      index += 2;
+      while (index < length && !(source[index] === '*' && source[index + 1] === '/')) {
+        if (source[index] === '\n') line++;
+        index++;
+      }
+      index += 2;
+      continue;
+    }
+    if (char === "'" || char === '"' || char === '`') {
+      const quote = char;
+      const startLine = line;
+      index++;
+      let text = '';
+      while (index < length) {
+        if (source[index] === '\\') { text += source[index] + (source[index + 1] ?? ''); index += 2; continue; }
+        if (source[index] === quote) { index++; break; }
+        if (source[index] === '\n') {
+          line++;
+          if (quote !== '`') break; // unterminated single/double quote — bail
+        }
+        text += source[index++];
+      }
+      found.push({ text, line: startLine });
+      continue;
+    }
+    index++;
+  }
+
+  return found;
+}
+
+/** Every embedded token in `source` that the registry cannot resolve. */
+function findUnresolvableTokens(source: string, file: string, known: Set<string>): TokenViolation[] {
+  if (!source.includes('{{')) return [];
+
+  const violations: TokenViolation[] = [];
+  for (const literal of stringLiterals(source)) {
+    if (!literal.text.includes('{{')) continue;
+    if (WHOLE_TOKEN_PATTERN.test(literal.text)) continue; // a fillable field
+
+    for (const match of literal.text.matchAll(TOKEN_PATTERN)) {
+      if (known.has(match[1])) continue;
+      violations.push({
+        key: match[1],
+        file,
+        line: literal.line,
+        excerpt: literal.text.replace(/\s+/g, ' ').slice(0, 72),
+      });
+    }
+  }
+  return violations;
+}
+
+/**
+ * Fails the build when copy references a token that has no home in the config,
+ * and reports which fillable placeholders are still outstanding.
+ */
+function tokenValidationPlugin(): Plugin {
+  const known = new Set(tokenKeys());
+  const violations: TokenViolation[] = [];
+  let isBuild = false;
+
+  return {
+    name: 'luxe:token-validation',
+    configResolved(config) {
+      isBuild = config.command === 'build';
+    },
+    transform(code, id) {
+      if (!/\.(ts|tsx)$/.test(id) || id.includes('node_modules')) return null;
+      const rel = id.replace(process.cwd().replace(/\\/g, '/'), '').replace(/^\//, '');
+      violations.push(...findUnresolvableTokens(code, rel, known));
+      return null;
+    },
+    buildEnd() {
+      if (violations.length > 0) {
+        /* Group by key: one token is usually quoted in several places. */
+        const byKey = new Map<string, TokenViolation[]>();
+        for (const v of violations) {
+          const list = byKey.get(v.key) ?? [];
+          list.push(v);
+          byKey.set(v.key, list);
+        }
+
+        const report = [...byKey.entries()]
+          .map(([key, sites]) => {
+            const where = sites.map((s) => `      ${s.file}:${s.line}  "${s.excerpt}…"`).join('\n');
+            return `  {{${key}}} is embedded in copy but is not a registered token\n${where}`;
+          })
+          .join('\n\n');
+
+        const message =
+          `\n${byKey.size} token(s) referenced in copy can never be resolved:\n\n${report}\n\n` +
+          `  A token embedded inside a sentence can only come from the registry in\n` +
+          `  src/lib/tokens.ts. Because these keys are not registered, no value in\n` +
+          `  site.config.ts will ever fill them and the raw {{TOKEN}} would ship.\n\n` +
+          `  Fix by either:\n` +
+          `    a) adding a field to site.config.ts and mapping it in buildRegistry(), or\n` +
+          `    b) restructuring the copy so the token is the WHOLE string value,\n` +
+          `       which makes it a normal fillable placeholder.\n`;
+
+        /* Hard error on a production build; a warning in dev keeps HMR alive. */
+        if (isBuild) this.error(message);
+        else this.warn(message);
+        return;
+      }
+
+      /* No defects. Report what is still outstanding as a go-live checklist. */
+      if (!isBuild) return;
+      const unfilled = tokenKeys().filter((key) => !isFilled(registryValue(key)));
+      if (unfilled.length > 0) {
+        this.warn(
+          `${unfilled.length} of ${tokenKeys().length} tokens are still placeholders and will be ` +
+            `stripped from the production output: ${unfilled.join(', ')}. ` +
+            `Fill them in src/config/site.config.ts before going live.`,
+        );
+      }
+    },
+  };
+}
+
+/** Current value behind a registry key, for the go-live report. */
+function registryValue(key: string): string {
+  /* `tClean` resolves and strips; a still-placeholder token cleans to ''. */
+  return tClean(`{{${key}}}`);
+}
+
 function robotsTxt(): string {
   const sitemap = origin() ? `${origin()}/sitemap.xml` : '/sitemap.xml';
   return [
@@ -316,7 +508,7 @@ function crawlFilesPlugin(): Plugin {
  * - CSS + JS are minified by esbuild in `vite build`.
  */
 export default defineConfig({
-  plugins: [react(), tailwindcss(), seoHtmlPlugin(), crawlFilesPlugin()],
+  plugins: [react(), tailwindcss(), seoHtmlPlugin(), crawlFilesPlugin(), tokenValidationPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

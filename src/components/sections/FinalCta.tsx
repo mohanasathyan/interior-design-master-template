@@ -8,6 +8,7 @@ import { Section } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Img } from '@/components/common/Img';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -89,7 +90,7 @@ export function FinalCta() {
           <Reveal preset="up" delay={0.18}>
             <div className="mt-11 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap sm:items-center">
               <Button asChild size="xl">
-                <Link to="/contact">
+                <Link to={routes.contact}>
                   {siteConfig.cta.primary}
                   <ArrowRight
                     className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"

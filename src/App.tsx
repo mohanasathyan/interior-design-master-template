@@ -21,11 +21,14 @@ import { Layout } from '@/components/layout/Layout';
  * ============================================================================
  */
 import Home from '@/pages/Home';
+import { routes } from '@/config/routes';
 
 const Services = lazy(() => import('@/pages/Services'));
 const Projects = lazy(() => import('@/pages/Projects'));
 const About = lazy(() => import('@/pages/About'));
 const Contact = lazy(() => import('@/pages/Contact'));
+const Privacy = lazy(() => import('@/pages/Privacy'));
+const Terms = lazy(() => import('@/pages/Terms'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 /**
@@ -69,7 +72,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route index element={<Home />} />
               <Route
-                path="services"
+                path={routes.services}
                 element={
                   <Suspense fallback={<RouteFallback />}>
                     <Services />
@@ -77,7 +80,7 @@ export default function App() {
                 }
               />
               <Route
-                path="projects"
+                path={routes.projects}
                 element={
                   <Suspense fallback={<RouteFallback />}>
                     <Projects />
@@ -85,7 +88,7 @@ export default function App() {
                 }
               />
               <Route
-                path="about"
+                path={routes.about}
                 element={
                   <Suspense fallback={<RouteFallback />}>
                     <About />
@@ -93,10 +96,26 @@ export default function App() {
                 }
               />
               <Route
-                path="contact"
+                path={routes.contact}
                 element={
                   <Suspense fallback={<RouteFallback />}>
                     <Contact />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={routes.privacy}
+                element={
+                  <Suspense fallback={<RouteFallback />}>
+                    <Privacy />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={routes.terms}
+                element={
+                  <Suspense fallback={<RouteFallback />}>
+                    <Terms />
                   </Suspense>
                 }
               />

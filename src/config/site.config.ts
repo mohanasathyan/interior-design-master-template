@@ -3,6 +3,8 @@ import type { SiteConfig } from './site.config.types';
 // (to inject real metadata into index.html at build time), and the alias is not
 // available in that context.
 import { photo } from '../lib/images';
+// Route paths are application structure, not client data — see src/config/routes.ts.
+import { routes } from './routes';
 
 /**
  * ============================================================================
@@ -35,6 +37,29 @@ import { photo } from '../lib/images';
  *  this config at render time. See `src/lib/tokens.ts` for the token registry.
  *
  *  ---------------------------------------------------------------------------
+ *  THE TWO KINDS OF TOKEN — the distinction that matters
+ *  ---------------------------------------------------------------------------
+ *   • FILLABLE — the token is the WHOLE value of a field:
+ *         year: '{{MILESTONE_1_YEAR}}'
+ *     Replace the string. Nothing else is needed.
+ *
+ *   • REGISTERED — the token is embedded inside a sentence:
+ *         'Serving {{CITY}} since {{FOUNDING_YEAR}}'
+ *     There is no string to replace, so it can only be resolved through the
+ *     registry in `src/lib/tokens.ts`. An embedded token whose key is NOT in
+ *     that registry can never be filled in by anyone, and would ship the raw
+ *     `{{TOKEN}}` to the live site.
+ *
+ *  `npm run build` FAILS on that second case and names the file and line. If
+ *  you add a new token to copy, add the field here and map it in
+ *  `buildRegistry()` — or restructure the copy so the token is the whole value.
+ *
+ *  As a final safety net, a production build strips any token that is still
+ *  unresolved and tidies the punctuation around it, so a missed field shortens
+ *  a sentence rather than printing `{{FOUNDER_NAME}}` at a visitor. The dev
+ *  server keeps showing them, which is what makes them reviewable.
+ *
+ *  ---------------------------------------------------------------------------
  *  GO-LIVE CHECKLIST
  *  ---------------------------------------------------------------------------
  *   1. Replace every `{{TOKEN}}` in this file.
@@ -44,6 +69,8 @@ import { photo } from '../lib/images';
  *   5. Set `forms.endpoint` to a real form endpoint.
  *   6. Run `npm run build` — robots.txt and sitemap.xml are generated from
  *      seo.siteUrl, and the build warns loudly if it is still a placeholder.
+ *      The build also FAILS on any token that no configuration could ever fill,
+ *      and lists every field still left as a placeholder.
  *   7. Review `src/data/*` — services, projects, FAQs and testimonials.
  * ============================================================================
  */
@@ -62,6 +89,31 @@ export const siteConfig: SiteConfig = {
     /* Leave as tokens until you have genuine public reviews to cite. */
     rating: '{{GOOGLE_RATING}}',
     reviewCount: '{{REVIEW_COUNT}}',
+    /*
+     * Quoted on the About page, in the home page pull-quote attribution and in
+     * the founder photograph's alt text — so it is defined once, here.
+     */
+    founder: {
+      name: '{{FOUNDER_NAME}}',
+      role: '{{FOUNDER_ROLE}}',
+      credential: '{{FOUNDER_CREDENTIAL}}',
+    },
+  },
+
+  /* ==========================================================================
+   * 1b · HEADLINE COMMERCIAL FACTS
+   * --------------------------------------------------------------------------
+   * Each of these is quoted in running prose in more than one place. Include
+   * the unit in the value — "5 years", not "5" — because they are dropped
+   * straight into a sentence.
+   * ========================================================================== */
+  facts: {
+    warrantyYears: '{{WARRANTY_YEARS}}',
+    priceStarting: '{{PRICE_STARTING}}',
+    priceFullHome: '{{PRICE_FULL_HOME}}',
+    timelineRoom: '{{TIMELINE_ROOM}}',
+    timelineHome: '{{TIMELINE_HOME}}',
+    timelineDesign: '{{TIMELINE_DESIGN}}',
   },
 
   /* ==========================================================================
@@ -411,37 +463,49 @@ export const siteConfig: SiteConfig = {
     locale: 'en_IN',
     pages: {
       home: {
-        path: '/',
+        path: routes.home,
         title: '{{BUSINESS_NAME}} — Luxury Interior Design in {{CITY}}',
         description:
           'Designing beautiful spaces that reflect your lifestyle. Turnkey residential and commercial interior design in {{CITY}} — 3D designs, transparent pricing and on-time handover. Book a free consultation.',
       },
       services: {
-        path: '/services',
+        path: routes.services,
         title: 'Interior Design Services',
         description:
           'Residential and commercial interior design, modular kitchens, wardrobes, false ceilings, lighting design and turnkey home renovation in {{CITY}}. Explore the full service range from {{BUSINESS_NAME}}.',
       },
       projects: {
-        path: '/projects',
+        path: routes.projects,
         title: 'Our Projects',
         description:
           'Browse completed interior design projects by {{BUSINESS_NAME}} across {{CITY}} — apartments, villas, kitchens, offices and retail. Real areas, timelines and budget bands for every project.',
       },
       about: {
-        path: '/about',
+        path: routes.about,
         title: 'About Our Studio',
         description:
           'Meet the team behind {{BUSINESS_NAME}}. Our story, design philosophy, quality standards and the process we follow on every interior project in {{CITY}}.',
       },
       contact: {
-        path: '/contact',
+        path: routes.contact,
         title: 'Contact & Free Consultation',
         description:
           'Talk to {{BUSINESS_NAME}} about your interior project. Call {{PHONE}}, message us on WhatsApp, or book a free design consultation at our {{CITY}} studio.',
       },
+      privacy: {
+        path: routes.privacy,
+        title: 'Privacy Policy',
+        description:
+          'How {{BUSINESS_NAME}} collects, uses and protects the information you share through this website and when enquiring about an interior design project.',
+      },
+      terms: {
+        path: routes.terms,
+        title: 'Terms of Service',
+        description:
+          'The terms on which {{BUSINESS_NAME}} provides this website and its interior design services — quotations, timelines, warranty and ownership.',
+      },
       notFound: {
-        path: '/404',
+        path: routes.notFound,
         title: 'Page Not Found',
         description: 'The page you were looking for has moved or no longer exists.',
       },
@@ -457,16 +521,54 @@ export const siteConfig: SiteConfig = {
    * ========================================================================== */
   forms: {
     endpoint: '{{FORM_ENDPOINT}}',
+    /*
+     * Each band is a WHOLE-STRING placeholder, so the client writes the entire
+     * label — currency, wording and all: "Under ₹5 lakh", "₹5–10 lakh",
+     * "Above ₹50 lakh".
+     *
+     * Three of these already worked that way and two wrapped the token in
+     * prose ("Under {{BUDGET_BAND_1}}"). That was not a stylistic difference:
+     * a token embedded in a sentence is only resolvable through the registry,
+     * and these have no registry entry — so those two could never be filled in
+     * and would have shipped the raw token to a live site. Making the array
+     * uniform also lets a client use a currency symbol or a band structure the
+     * template never anticipated.
+     */
     budgetOptions: [
-      'Under {{BUDGET_BAND_1}}',
+      '{{BUDGET_BAND_1}}',
       '{{BUDGET_BAND_2}}',
       '{{BUDGET_BAND_3}}',
       '{{BUDGET_BAND_4}}',
-      'Above {{BUDGET_BAND_5}}',
+      '{{BUDGET_BAND_5}}',
       'Not sure yet — please advise',
     ],
     successMessage:
       "Thank you — your enquiry has reached our design team. We'll be in touch within one business day.",
+  },
+
+  /* ==========================================================================
+   * 10b · ANALYTICS
+   * --------------------------------------------------------------------------
+   * Leave these as tokens and the site ships with NO analytics at all — no
+   * third-party script, no cookies, no `dataLayer`, no click listener. Paste a
+   * real ID in and conversion tracking starts on the next load; nothing else
+   * needs to change.
+   *
+   * Normally you want ONE of these. GTM alone is the usual choice, with the
+   * GA4 tag configured inside the container. Filling in both loads both, and
+   * if the container also reports to the same GA4 property you will count
+   * every enquiry twice.
+   *
+   * Conversions tracked out of the box: WhatsApp, click-to-call, email,
+   * consultation/quote CTAs and contact form submissions. See
+   * `src/lib/analytics.ts` — no per-button wiring is needed.
+   *
+   * ⚠️ Enabling analytics means setting cookies. Update the "Cookies and
+   * measurement" section of `src/data/legal.ts` to name the tools you turn on.
+   * ========================================================================== */
+  analytics: {
+    ga4MeasurementId: '{{GA_MEASUREMENT_ID}}',
+    gtmContainerId: '{{GTM_CONTAINER_ID}}',
   },
 
   /* ==========================================================================

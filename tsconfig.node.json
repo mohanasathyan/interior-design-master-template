@@ -13,7 +13,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["node"]
+    /*
+     * `vite/client` alongside `node` because this project does not compile
+     * vite.config.ts alone — it also pulls in everything the config imports,
+     * which includes `src/lib/tokens.ts`. That module reads `import.meta.env`
+     * to tell a dev server from a production build, and without the Vite client
+     * types `ImportMeta` here has no `env` and the build fails to typecheck.
+     */
+    "types": ["node", "vite/client"]
   },
   "include": ["vite.config.ts"]
 }

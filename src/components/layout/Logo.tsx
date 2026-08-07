@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { siteConfig } from '@/config/site.config';
 import { isFilled, t } from '@/lib/tokens';
 import { cn } from '@/lib/utils';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -19,13 +20,23 @@ import { cn } from '@/lib/utils';
 export function Logo({
   tone = 'default',
   className,
-  linkTo = '/',
+  linkTo = routes.home,
+  compact = false,
 }: {
   /** `light` for use over dark photography and the footer. */
   tone?: 'default' | 'light';
   className?: string;
   /** Set to `null` to render the mark without wrapping it in a link. */
   linkTo?: string | null;
+  /**
+   * Hold the tagline back until `xl` instead of showing it from `sm`.
+   *
+   * For the HEADER only. Between `lg` and `xl` the bar has to fit the wordmark,
+   * five navigation links and the call to action across as little as 912px of
+   * usable width, and the tagline is the one part of the mark that carries no
+   * navigational weight. The footer keeps it from `sm`, where there is room.
+   */
+  compact?: boolean;
 }) {
   const light = tone === 'light';
   const asset = light ? siteConfig.brand.logoLight : siteConfig.brand.logo;
@@ -78,7 +89,8 @@ export function Logo({
         {isFilled(siteConfig.business.tagline) && (
           <span
             className={cn(
-              'mt-1.5 hidden text-[0.55rem] font-medium uppercase tracking-[0.3em] sm:block',
+              'mt-1.5 hidden text-[0.55rem] font-medium uppercase tracking-[0.3em]',
+              compact ? 'xl:block' : 'sm:block',
               light ? 'text-white/70' : 'text-ink-muted',
             )}
           >

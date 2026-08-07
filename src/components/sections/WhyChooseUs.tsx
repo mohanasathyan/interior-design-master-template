@@ -8,6 +8,7 @@ import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup } from '@/components/common/Reveal';
 import { FeatureCard } from '@/components/common/FeatureCard';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -80,7 +81,7 @@ export function WhyChooseUs() {
             )}
           </p>
           <Button asChild size="lg">
-            <Link to="/contact">
+            <Link to={routes.contact}>
               {siteConfig.cta.primary}
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"

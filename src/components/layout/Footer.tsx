@@ -14,7 +14,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
-import { footerCompanyLinks, footerServiceLinks } from '@/data/navigation';
+import { staticFiles } from '@/config/routes';
+import { footerCompanyLinks, footerServiceLinks, legalNav } from '@/data/navigation';
 import { formattedAddress, groupedHours, mailLink, mapLink, reviewLink, socialLinks, telLink, whatsappLink } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
 import { cn } from '@/lib/utils';
@@ -89,16 +90,44 @@ export function Footer() {
                   {socials.map((social) => {
                     const Icon = SOCIAL_ICONS[social.platform] ?? Star;
                     const pending = !isFilled(social.url);
+                    /* Identical resting appearance either way — only the
+                       interactive affordances differ. */
+                    const shell = cn(
+                      'grid size-11 place-items-center rounded-(--radius-brand)',
+                      'border border-white/12 text-contrast-ink/70',
+                    );
+
+                    /*
+                      An unconfigured profile is INERT, which is what the config
+                      has always promised ("Link placeholders are detected and
+                      rendered as inert, so you never ship a dead link").
+
+                      It used to render as a link to the contact page carrying
+                      the label "<Business> on Instagram" — so a screen-reader
+                      user was told they were going to Instagram and landed on
+                      the contact form, and because it was a bare <a> rather
+                      than a router link it also threw away the SPA and did a
+                      full page reload on the way.
+                    */
+                    if (pending) {
+                      return (
+                        <li key={social.platform}>
+                          <span aria-hidden="true" className={shell}>
+                            <Icon className="size-[1.05rem]" strokeWidth={1.5} />
+                          </span>
+                        </li>
+                      );
+                    }
+
                     return (
                       <li key={social.platform}>
                         <a
-                          href={pending ? '/contact' : social.url}
-                          target={pending ? undefined : '_blank'}
-                          rel={pending ? undefined : 'noopener noreferrer'}
+                          href={social.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           aria-label={`${t(siteConfig.business.name)} on ${social.label}`}
                           className={cn(
-                            'grid size-11 place-items-center rounded-(--radius-brand)',
-                            'border border-white/12 text-contrast-ink/70',
+                            shell,
                             'transition-all duration-500 ease-luxe',
                             'hover:-translate-y-0.5 hover:border-accent hover:bg-accent-button hover:text-white',
                           )}
@@ -314,21 +343,33 @@ export function Footer() {
             © {year} {t(siteConfig.business.legalName)}. All rights reserved.
           </p>
 
+          {/* These pointed at /contact, which implied a policy existed and then
+              did not show one. They are real routes now — see src/pages/. */}
           <ul className="flex flex-wrap items-center gap-x-7 gap-y-2 text-[0.8rem] text-contrast-ink/60">
+            {legalNav.map((item) => (
+              <li key={item.href}>
+                <Link to={item.href} className="link-underline transition-colors hover:text-accent">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
             <li>
-              <Link to="/contact" className="link-underline transition-colors hover:text-accent">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="link-underline transition-colors hover:text-accent">
-                Terms of Service
-              </Link>
-            </li>
-            <li>
-              <Link to="/projects" className="link-underline transition-colors hover:text-accent">
+              {/*
+                Points at the real sitemap. It used to be a router link to
+                /projects — a "Sitemap" label that opened the portfolio, which
+                is misleading to a visitor and useless to a crawler following it.
+
+                A plain <a>, deliberately: /sitemap.xml is a file emitted by the
+                build, not a React route. A router <Link> would try to resolve
+                it client-side and land on the 404 view instead of letting the
+                server return the file.
+              */}
+              <a
+                href={staticFiles.sitemap}
+                className="link-underline transition-colors hover:text-accent"
+              >
                 Sitemap
-              </Link>
+              </a>
             </li>
           </ul>
         </div>

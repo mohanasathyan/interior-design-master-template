@@ -1,4 +1,5 @@
 import { Eye, Heart, Scale, Sparkle, Target, Users, type LucideIcon } from 'lucide-react';
+import { siteConfig } from '@/config/site.config';
 
 /**
  * ============================================================================
@@ -91,17 +92,30 @@ export const values: Value[] = [
 /*  FOUNDER                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The founder's identity comes from `site.config.ts`, not from here.
+ *
+ * It used to be declared in this file as its own set of `{{TOKENS}}`, which
+ * made this the third place the same person was named — alongside the home
+ * page pull-quote attribution and the founder photograph's alt text. Those two
+ * referenced `{{FOUNDER_NAME}}` as registry tokens, and the registry only reads
+ * `site.config.ts`, so they could never resolve: filling this file in fixed the
+ * About page and left the other two rendering the raw token on the live site.
+ *
+ * One home, in the config, quoted everywhere else. The LETTER stays here,
+ * because that is copy rather than identity.
+ */
 export const founder = {
-  name: '{{FOUNDER_NAME}}',
-  role: '{{FOUNDER_ROLE}}',
-  credential: '{{FOUNDER_CREDENTIAL}}',
+  name: siteConfig.business.founder.name,
+  role: siteConfig.business.founder.role,
+  credential: siteConfig.business.founder.credential,
   /** A short, personal letter. The drop-cap treatment makes it read as one. */
   letter: [
     'I started this studio because I was tired of watching people receive a beautiful design and then a completely different building experience. The rendering promised one thing. The site delivered another. Somewhere between the two, the client stopped being excited and started being anxious.',
     'So we built the practice around closing that gap. We keep design and execution in the same team, we name our materials in writing, we publish our schedule, and we put one person in charge of your project who you can reach directly.',
     'None of that is glamorous. But it is the reason our clients recommend us — and, far more often than we expected, come back to us for their next home.',
   ],
-  signature: '{{FOUNDER_NAME}}',
+  signature: siteConfig.business.founder.name,
 };
 
 /* -------------------------------------------------------------------------- */

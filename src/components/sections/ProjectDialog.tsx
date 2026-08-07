@@ -8,6 +8,7 @@ import { Img } from '@/components/common/Img';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -139,7 +140,7 @@ export function ProjectDialog({
                     <Button asChild size="md" block>
                       {/* The project travels with the enquiry, so the studio
                           already knows what the visitor responded to. */}
-                      <Link to="/contact" state={{ project: project.slug }}>
+                      <Link to={routes.contact} state={{ project: project.slug }}>
                         {siteConfig.cta.tertiary}
                         <ArrowRight
                           className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"

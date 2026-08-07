@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/common/Section';
 import { AnnouncementBar } from './AnnouncementBar';
 import { Logo } from './Logo';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -148,11 +149,27 @@ export function Navbar() {
               solid ? 'h-18 lg:h-20' : 'h-22 lg:h-28',
             )}
           >
-            <Logo tone={solid ? 'default' : 'light'} />
+            {/*
+              `shrink-0` is load-bearing between `lg` and `xl`.
+
+              Without it the mark is a shrinkable flex item, and a flex item
+              shrinks to its MIN-CONTENT — for a wordmark that is the width of
+              its longest single word. A two- or three-word studio name was
+              therefore compressed to a third of its width and wrapped onto
+              three lines inside a bar that is only 80px tall. Measured at
+              1024px: 245px of mark squeezed into 102px.
+            */}
+            <Logo tone={solid ? 'default' : 'light'} compact className="shrink-0" />
 
             {/* ---------------- Desktop navigation ---------------- */}
             <nav aria-label="Primary" className="hidden lg:block">
-              <ul className="flex items-center gap-10">
+              {/*
+                The nav is the only group here that can give width back without
+                losing information, so it is where the space comes from. Four
+                gaps at 24px instead of 40px frees 64px between `lg` and `xl`,
+                and the full `gap-10` rhythm returns at `xl` exactly as designed.
+              */}
+              <ul className="flex items-center gap-6 xl:gap-10">
                 {primaryNav.map((item) => (
                   <li key={item.href}>
                     <NavLink
@@ -181,12 +198,33 @@ export function Navbar() {
             </nav>
 
             {/* ---------------- Desktop actions ---------------- */}
-            <div className="hidden items-center gap-5 lg:flex">
+            <div className="hidden shrink-0 items-center gap-5 lg:flex">
               {isFilled(siteConfig.contact.phone) && (
                 <a
                   href={call.href}
                   className={cn(
-                    'group inline-flex items-center gap-2.5 text-[0.78rem] font-medium tracking-[0.04em]',
+                    /*
+                      Held back to `2xl`, and the breakpoint is measured rather
+                      than chosen.
+
+                      The complete bar — wordmark with tagline, five links at
+                      the full `gap-10` rhythm, the number and the call to
+                      action — needs 1216px of row width. The `hero` container
+                      gutters mean that is not available until a 1366px
+                      viewport. At `xl` (1280px) the row has 1142px, so the
+                      full set has ALWAYS been 74px over budget there; it never
+                      looked broken only because the button and the wordmark
+                      were being silently compressed to absorb it, which is the
+                      defect this change removes.
+
+                      The number is the right thing to defer. It is the widest
+                      optional item at 143px, and it is the one conversion route
+                      here that is duplicated on the same screen — the floating
+                      call button carries it at every width, and it is the first
+                      action inside the mobile drawer. The alternative was
+                      compressing the studio's own name to make room for it.
+                    */
+                    'group hidden items-center gap-2.5 text-[0.78rem] font-medium tracking-[0.04em] 2xl:inline-flex',
                     'transition-colors duration-300',
                     solid ? 'text-ink hover:text-accent-strong' : 'text-white/85 hover:text-white',
                   )}
@@ -201,12 +239,30 @@ export function Navbar() {
 
               {/* `md` over the hero — the reference draws a generous outlined
                   button, not the compact one used on scrolled/inner pages. */}
+              {/*
+                `shrink-0`, and it fixes a defect rather than tuning a spacing.
+
+                The button primitive carries `overflow-hidden` so the hover
+                sheen is clipped to its own face. Per the flexbox spec a flex
+                item's `min-width: auto` resolves to its content-based minimum
+                ONLY while `overflow` is `visible`; with `hidden` the automatic
+                minimum becomes 0. So this button was infinitely shrinkable,
+                and because its label is `whitespace-nowrap` the text did not
+                reflow — it was cut off mid-word inside the button. Measured at
+                1024–1280px: 8–14px of "Book Free Consultation" clipped away,
+                on the primary conversion control, for every client.
+
+                Scoped here rather than added to `buttonVariants`, because
+                every other button on the site sits in a container that wants
+                it to be shrinkable.
+              */}
               <Button
                 asChild
                 size={solid ? 'sm' : 'md'}
                 variant={solid ? 'primary' : 'outlineGold'}
+                className="shrink-0"
               >
-                <Link to="/contact">
+                <Link to={routes.contact}>
                   {siteConfig.cta.primary}
                   <ArrowRight
                     className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
@@ -311,7 +367,7 @@ export function Navbar() {
                 className="mt-10 flex flex-col gap-3"
               >
                 <Button asChild size="lg" block>
-                  <Link to="/contact">{siteConfig.cta.primary}</Link>
+                  <Link to={routes.contact}>{siteConfig.cta.primary}</Link>
                 </Button>
 
                 <div className="grid grid-cols-2 gap-3">

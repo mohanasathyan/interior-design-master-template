@@ -40,6 +40,7 @@ import { PageHero } from '@/components/sections/PageHero';
 import { ContactForm } from '@/components/sections/ContactForm';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -55,8 +56,8 @@ import { Button } from '@/components/ui/button';
  * ============================================================================
  */
 const CRUMBS: Crumb[] = [
-  { name: 'Home', path: '/' },
-  { name: 'Contact', path: '/contact' },
+  { name: 'Home', path: routes.home },
+  { name: 'Contact', path: routes.contact },
 ];
 
 const SOCIAL_ICONS: Record<string, LucideIcon> = {

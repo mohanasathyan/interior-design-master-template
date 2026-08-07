@@ -9,6 +9,7 @@ import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { IconChip } from '@/components/common/IconChip';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -111,7 +112,7 @@ export function PromiseSection() {
                 )}
               </p>
               <Button asChild size="lg">
-                <Link to="/contact">{siteConfig.cta.primary}</Link>
+                <Link to={routes.contact}>{siteConfig.cta.primary}</Link>
               </Button>
             </div>
           </Reveal>

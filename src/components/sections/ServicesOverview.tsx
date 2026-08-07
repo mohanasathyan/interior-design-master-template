@@ -9,6 +9,7 @@ import { Section, SectionHeading } from '@/components/common/Section';
 import { RevealGroup, Reveal } from '@/components/common/Reveal';
 import { Button } from '@/components/ui/button';
 import { ServiceCard } from './ServiceCard';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -40,7 +41,7 @@ export function ServicesOverview() {
 
         <Reveal preset="up" delay={0.15} className="shrink-0">
           <Button asChild variant="outline" size="md">
-            <Link to="/services">
+            <Link to={routes.services}>
               All {services.length} Services
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
@@ -76,7 +77,7 @@ export function ServicesOverview() {
 
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link to="/services">Explore All Services</Link>
+              <Link to={routes.services}>Explore All Services</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <a href={call.href}>

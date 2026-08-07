@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { m, type Variants } from 'framer-motion';
 import {
   fadeIn,
@@ -11,6 +11,7 @@ import {
   staggerContainer,
   viewportOnce,
   viewportRepeat,
+  withDelay,
 } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/hooks';
 import { cn } from '@/lib/utils';
@@ -65,6 +66,17 @@ export function Reveal({
   const reduceMotion = usePrefersReducedMotion();
   const Component = m[as] as typeof m.div;
 
+  /*
+   * The delay has to live INSIDE the variant, not in a `transition` prop — a
+   * variant's own transition replaces that prop rather than merging with it, so
+   * the prop form was silently dropped on every preset. See `withDelay`.
+   *
+   * Memoised so a reveal keeps one stable variants object across re-renders
+   * (`ServiceRow` and `ProcessTimeline` both re-render this on a breakpoint
+   * change), and so an undelayed reveal keeps the shared preset by identity.
+   */
+  const variants = useMemo(() => withDelay(PRESETS[preset], delay), [preset, delay]);
+
   if (reduceMotion) {
     const Static = as;
     return <Static className={className}>{children}</Static>;
@@ -73,11 +85,10 @@ export function Reveal({
   return (
     <Component
       className={className}
-      variants={PRESETS[preset]}
+      variants={variants}
       initial="hidden"
       whileInView="visible"
       viewport={repeat ? viewportRepeat : viewportOnce}
-      transition={{ delay }}
     >
       {children}
     </Component>

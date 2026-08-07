@@ -14,6 +14,7 @@ import { ServiceRow } from '@/components/sections/ServiceRow';
 import { ProcessTimeline } from '@/components/sections/ProcessTimeline';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { FinalCta } from '@/components/sections/FinalCta';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -29,8 +30,8 @@ import { FinalCta } from '@/components/sections/FinalCta';
  * ============================================================================
  */
 const CRUMBS: Crumb[] = [
-  { name: 'Home', path: '/' },
-  { name: 'Services', path: '/services' },
+  { name: 'Home', path: routes.home },
+  { name: 'Services', path: routes.services },
 ];
 
 export default function Services() {
@@ -59,7 +60,7 @@ export default function Services() {
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <Link to="/contact">{siteConfig.cta.primary}</Link>
+            <Link to={routes.contact}>{siteConfig.cta.primary}</Link>
           </Button>
           <Button asChild size="lg" variant="outlineInk">
             <a href={call.href}>
@@ -146,7 +147,7 @@ export default function Services() {
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
-                <Link to="/contact">
+                <Link to={routes.contact}>
                   {siteConfig.cta.primary}
                   <ArrowRight
                     className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"
@@ -155,7 +156,7 @@ export default function Services() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to="/projects">See These Services Built</Link>
+                <Link to={routes.projects}>See These Services Built</Link>
               </Button>
             </div>
           </div>

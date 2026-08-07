@@ -1,4 +1,5 @@
 import { siteConfig } from '@/config/site.config';
+import { routes } from '@/config/routes';
 import { isFilled, t } from './tokens';
 import { formatTime } from './utils';
 
@@ -14,7 +15,7 @@ import { formatTime } from './utils';
  */
 
 /** Fallback target used whenever a contact channel has not been configured. */
-const FALLBACK = '/contact';
+const FALLBACK = routes.contact;
 
 export interface ResolvedLink {
   href: string;

@@ -89,6 +89,69 @@ export const drawLine: Variants = {
 };
 
 /**
+ * ============================================================================
+ * DELAY, FOLDED INTO THE VARIANT
+ * ============================================================================
+ * Returns a copy of `variants` with `delay` merged into its `visible`
+ * transition. Everything else — duration, curve, distance — is left exactly as
+ * the preset declares it.
+ *
+ * WHY THIS IS NOT JUST `transition={{ delay }}`
+ *
+ * A `transition` PROP on a motion component is only a FALLBACK. When the
+ * variant being animated to carries its own `transition`, that object replaces
+ * the prop wholesale rather than merging with it. From `animateTarget` in
+ * motion-dom:
+ *
+ *     let { transition, transitionEnd, ...target } = targetAndTransition;
+ *     const defaultTransition = visualElement.getDefaultTransition();  // props.transition
+ *     transition = transition
+ *       ? resolveTransition(transition, defaultTransition)
+ *       : defaultTransition;
+ *
+ * …and `resolveTransition` merges the two ONLY when the variant opts in with
+ * `inherit: true`. Every preset above declares a `transition` — that is what
+ * gives each one its duration and curve — so none of them ever reached the
+ * fallback. `<m.div variants={fadeUp} transition={{ delay }} />` animated for
+ * the right duration on the right curve and with NO DELAY AT ALL.
+ *
+ * Nothing warned, nothing threw, and each element still animated. The only
+ * symptom was that everything arrived at once: a whole page of reveals firing
+ * on the same frame instead of as a sequence. Folding the delay into the
+ * variant puts it on the winning side of that precedence rule.
+ *
+ * ⚠️ THE `delay === 0` EARLY RETURN IS LOAD-BEARING — it is not an
+ * optimisation, and removing it silently breaks every `<RevealGroup />`.
+ *
+ * A parent's `staggerChildren` reaches each child as an OPTION, and
+ * `animateTarget` applies that option before spreading the variant's own
+ * transition over the top:
+ *
+ *     const valueTransition = { delay, ...getValueTransition(transition, key) };
+ *
+ * So a `delay: 0` sitting in a child's variant would overwrite the stagger the
+ * parent had just computed for it, and a staggered grid would collapse into a
+ * single beat. Returning the preset untouched leaves the key absent, and an
+ * absent key is precisely what lets the parent's value survive the spread.
+ *
+ * For the same reason this never mutates: the preset objects are shared with
+ * `<RevealItem />`, which depends on them staying delay-free.
+ */
+export function withDelay(variants: Variants, delay: number): Variants {
+  if (!delay) return variants;
+
+  const visible = variants.visible;
+  /* The presets are all plain objects. A `TargetResolver` function has no
+     transition to merge into, so it is handed back rather than guessed at. */
+  if (typeof visible !== 'object') return variants;
+
+  return {
+    ...variants,
+    visible: { ...visible, transition: { ...visible.transition, delay } },
+  };
+}
+
+/**
  * Parent container that staggers its children.
  * @param stagger seconds between each child
  * @param delay   seconds before the first child

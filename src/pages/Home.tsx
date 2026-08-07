@@ -17,6 +17,7 @@ import { PromiseSection } from '@/components/sections/PromiseSection';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { FinalCta } from '@/components/sections/FinalCta';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -55,7 +56,7 @@ export default function Home() {
         path={page.path}
         schemas={[
           webPageSchema(page.title, page.description, page.path),
-          breadcrumbSchema([{ name: 'Home', path: '/' }]),
+          breadcrumbSchema([{ name: 'Home', path: routes.home }]),
           serviceSchema(services),
           faqSchema(faqs),
         ]}

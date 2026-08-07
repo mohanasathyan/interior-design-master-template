@@ -189,6 +189,54 @@ export interface SiteConfig {
     rating: string;
     /** Number of public reviews backing `rating`, e.g. "180". */
     reviewCount: string;
+    /**
+     * The founder's identity.
+     *
+     * It lives HERE, not in `src/data/about.ts`, because it is quoted in more
+     * than one place — the About page letter, the home page pull-quote
+     * attribution and the founder photograph's alt text. Anything named in more
+     * than one place needs exactly one home, or the copies drift.
+     *
+     * Registered as `{{FOUNDER_NAME}}`, `{{FOUNDER_ROLE}}` and
+     * `{{FOUNDER_CREDENTIAL}}`, so copy anywhere can quote it. The long-form
+     * founder's letter stays in `src/data/about.ts` — that is copy, not
+     * identity.
+     */
+    founder: {
+      /** Full name, e.g. "Priya Sharma". */
+      name: string;
+      /** Job title, e.g. "Founder & Principal Designer". */
+      role: string;
+      /** Qualification or credential line, e.g. "B.Arch, 14 years' practice". */
+      credential: string;
+    };
+  };
+
+  /**
+   * ---------------------------------------------------------------------------
+   * HEADLINE COMMERCIAL FACTS
+   * ---------------------------------------------------------------------------
+   * Figures the studio quotes in more than one place — FAQ answers, the trust
+   * strip, marketing copy. Each is registered as a `{{TOKEN}}`, so changing the
+   * warranty term or the entry price here updates every sentence that mentions
+   * it, on every page, with no risk of two pages contradicting each other.
+   *
+   * Keep the UNIT in the value ("5 years", not "5"), because these are dropped
+   * straight into running prose.
+   */
+  facts: {
+    /** `{{WARRANTY_YEARS}}` — e.g. "5 years". */
+    warrantyYears: string;
+    /** `{{PRICE_STARTING}}` — entry price for a single room, e.g. "₹3.5 lakh". */
+    priceStarting: string;
+    /** `{{PRICE_FULL_HOME}}` — typical full-home band, e.g. "₹12–35 lakh". */
+    priceFullHome: string;
+    /** `{{TIMELINE_ROOM}}` — a single room, e.g. "3–4 weeks". */
+    timelineRoom: string;
+    /** `{{TIMELINE_HOME}}` — a full home, e.g. "10–14 weeks". */
+    timelineHome: string;
+    /** `{{TIMELINE_DESIGN}}` — the design phase alone, e.g. "2–3 weeks". */
+    timelineDesign: string;
   };
 
   /** Everything a visitor can use to reach the business. */
@@ -349,6 +397,28 @@ export interface SiteConfig {
     budgetOptions: string[];
     /** Where the visitor heard about the studio — optional lead-quality signal. */
     successMessage: string;
+  };
+
+  /**
+   * ---------------------------------------------------------------------------
+   * ANALYTICS
+   * ---------------------------------------------------------------------------
+   * Both fields are OPTIONAL in practice: while either is a `{{TOKEN}}`, an
+   * empty string, or malformed, that provider is simply never loaded. No
+   * script, no `dataLayer`, no listener, no console noise. Paste a real ID in
+   * and it initialises on the next load with no code change.
+   *
+   * ⚠️ USE ONE OR THE OTHER, not both, unless you know why you want both.
+   * The usual setup is GTM alone, with the GA4 tag configured inside the
+   * container. Filling in BOTH fields loads GTM *and* gtag.js, and if the
+   * container also forwards to the same GA4 property every conversion is
+   * counted twice.
+   */
+  analytics: {
+    /** GA4 Measurement ID, e.g. "G-XXXXXXXXXX". Leave as a token to disable. */
+    ga4MeasurementId: string;
+    /** GTM container ID, e.g. "GTM-XXXXXXX". Leave as a token to disable. */
+    gtmContainerId: string;
   };
 
   /** Feature switches — turn whole UI affordances on or off per client. */

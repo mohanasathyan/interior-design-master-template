@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Img } from '@/components/common/Img';
 import { IconChip } from '@/components/common/IconChip';
 import { RevealItem } from '@/components/common/Reveal';
+import { serviceAnchor } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -25,7 +26,7 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
   return (
     <RevealItem as="article" className="group relative">
       <Link
-        to={`/services#${service.slug}`}
+        to={serviceAnchor(service.slug)}
         className="flex h-full flex-col overflow-hidden rounded-(--radius-brand) border border-border bg-surface transition-all duration-500 ease-luxe hover:-translate-y-1.5 hover:border-accent/35 hover:shadow-lift focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent"
       >
         {/* ---- Image ---- */}

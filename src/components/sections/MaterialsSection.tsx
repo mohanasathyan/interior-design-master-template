@@ -9,6 +9,7 @@ import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Img } from '@/components/common/Img';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription } from '@/components/ui/card';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -120,7 +121,7 @@ export function MaterialsSection() {
                 )}
               </CardDescription>
               <Button asChild size="md" className="shrink-0">
-                <Link to="/contact">{siteConfig.cta.tertiary}</Link>
+                <Link to={routes.contact}>{siteConfig.cta.tertiary}</Link>
               </Button>
             </Card>
           </Reveal>

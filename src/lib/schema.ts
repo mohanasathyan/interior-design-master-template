@@ -1,4 +1,5 @@
 import { siteConfig } from '@/config/site.config';
+import { serviceAnchor } from '@/config/routes';
 import { absoluteUrl, socialLinks } from './links';
 import { isFilled, tClean } from './tokens';
 
@@ -180,7 +181,7 @@ export function serviceSchema(items: { title: string; summary: string; slug: str
         '@type': 'Service',
         name: tClean(item.title),
         description: tClean(item.summary),
-        url: absoluteUrl(`/services#${item.slug}`),
+        url: absoluteUrl(serviceAnchor(item.slug)),
         serviceType: tClean(item.title),
         provider: { '@id': BUSINESS_ID },
         areaServed: filled(siteConfig.location.city),

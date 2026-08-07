@@ -20,6 +20,7 @@ import { ProjectCard } from '@/components/sections/ProjectCard';
 import { ProjectDialog } from '@/components/sections/ProjectDialog';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { FinalCta } from '@/components/sections/FinalCta';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -42,8 +43,8 @@ import { FinalCta } from '@/components/sections/FinalCta';
  * ============================================================================
  */
 const CRUMBS: Crumb[] = [
-  { name: 'Home', path: '/' },
-  { name: 'Projects', path: '/projects' },
+  { name: 'Home', path: routes.home },
+  { name: 'Projects', path: routes.projects },
 ];
 
 export default function Projects() {
@@ -108,7 +109,7 @@ export default function Projects() {
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <Link to="/contact">Start a Similar Project</Link>
+            <Link to={routes.contact}>Start a Similar Project</Link>
           </Button>
           <Button asChild size="lg" variant="outlineInk">
             <a href={call.href}>
@@ -246,7 +247,7 @@ export default function Projects() {
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
-                <Link to="/contact">
+                <Link to={routes.contact}>
                   {siteConfig.cta.primary}
                   <ArrowRight
                     className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"
@@ -255,7 +256,7 @@ export default function Projects() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to="/services">Explore Our Services</Link>
+                <Link to={routes.services}>Explore Our Services</Link>
               </Button>
             </div>
           </div>

@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -104,7 +105,7 @@ export function FaqSection({
 
                 {/* Tertiary route out, set as a quiet text link below the card. */}
                 <Link
-                  to="/contact"
+                  to={routes.contact}
                   className="group mt-6 inline-flex w-full items-center justify-center gap-2.5 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-ink-muted transition-colors duration-300 hover:text-accent-strong"
                 >
                   <span className="link-underline">Or send an enquiry instead</span>

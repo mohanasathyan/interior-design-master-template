@@ -13,6 +13,7 @@ import { Container } from '@/components/common/Section';
 import { Img } from '@/components/common/Img';
 import { Stat } from '@/components/common/Stat';
 import { IconChip } from '@/components/common/IconChip';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -341,7 +342,7 @@ export function Hero() {
                 'hover:bg-accent',
               )}
             >
-              <Link to="/contact">
+              <Link to={routes.contact}>
                 {t(heroCopy.ctaLabel)}
                 <ArrowRight
                   aria-hidden="true"

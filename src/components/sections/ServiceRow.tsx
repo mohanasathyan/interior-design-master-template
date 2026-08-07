@@ -11,6 +11,7 @@ import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Img } from '@/components/common/Img';
 import { IconChip } from '@/components/common/IconChip';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -186,7 +187,7 @@ export function ServiceRow({ service, index }: { service: Service; index: number
             <Reveal preset="up" delay={0.24}>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="md">
-                  <Link to="/contact" state={{ service: service.title }}>
+                  <Link to={routes.contact} state={{ service: service.title }}>
                     {siteConfig.cta.tertiary}
                     <ArrowRight
                       className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"

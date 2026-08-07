@@ -19,6 +19,7 @@ import { PageHero } from '@/components/sections/PageHero';
 import { ProcessTimeline } from '@/components/sections/ProcessTimeline';
 import { Testimonials } from '@/components/sections/Testimonials';
 import { FinalCta } from '@/components/sections/FinalCta';
+import { routes } from '@/config/routes';
 
 /**
  * ============================================================================
@@ -34,8 +35,8 @@ import { FinalCta } from '@/components/sections/FinalCta';
  * ============================================================================
  */
 const CRUMBS: Crumb[] = [
-  { name: 'Home', path: '/' },
-  { name: 'About', path: '/about' },
+  { name: 'Home', path: routes.home },
+  { name: 'About', path: routes.about },
 ];
 
 export default function About() {
@@ -68,7 +69,7 @@ export default function About() {
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <Link to="/contact">{siteConfig.cta.primary}</Link>
+            <Link to={routes.contact}>{siteConfig.cta.primary}</Link>
           </Button>
           <Button asChild size="lg" variant="outlineInk">
             <a href={call.href}>
@@ -102,10 +103,10 @@ export default function About() {
             <Reveal preset="up" delay={0.28}>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Button asChild size="md">
-                  <Link to="/projects">See Our Work</Link>
+                  <Link to={routes.projects}>See Our Work</Link>
                 </Button>
                 <Button asChild size="md" variant="outline">
-                  <Link to="/services">What We Offer</Link>
+                  <Link to={routes.services}>What We Offer</Link>
                 </Button>
               </div>
             </Reveal>
@@ -347,7 +348,7 @@ export default function About() {
               maxWidth="max-w-lg"
             >
               <Button asChild size="lg">
-                <Link to="/contact">
+                <Link to={routes.contact}>
                   {siteConfig.cta.primary}
                   <ArrowRight
                     className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"
