@@ -14,7 +14,7 @@ Every field below feeds a real part of the finished website. The list is generat
 | Required | 59 |
 | Optional | 63 |
 | Photographs | 41 |
-| Written records | 108 |
+| Written records | 107 |
 
 ## How to read this
 
@@ -251,7 +251,7 @@ Every field below feeds a real part of the finished website. The list is generat
 | Optional | Process stages and deliverables — `6 records` | What happens at each stage and what the client receives at the end of it. | Six well-specified defaults ship. Correct anything that does not match how you actually run a project. |
 | Optional | Six design principles — `principles` | Your stated point of view. A studio with one is bought on value; one without is bought on price. | Six defaults ship. |
 | Optional | Six material specifications — `materials` | What sits behind the surface — core, stone, veneer, hardware, finishes, lighting — with the quality claim for each. | Six defaults ship describing a premium specification. If yours differs, this becomes required rather than optional: it is a claim about what you supply. |
-| Optional | Six written promises — `promises` | Specific, falsifiable commitments. "The price we quote is the price you pay" is a contract term; "we are committed to quality" is noise. | Six defaults ship — and they appear in the agreement you sign with clients, per the copy. Confirm you can honour each. |
+| Optional | Five written promises — `promises` | Specific, falsifiable commitments. "The price we quote is the price you pay" is a contract term; "we are committed to quality" is noise. | Five defaults ship — and they appear in the agreement you sign with clients, per the copy. Confirm you can honour each. |
 | Optional | Four quality standards — `qualityStandards` | The checks every project passes before handover. | Four defaults ship. |
 | Optional | Eight differentiators — `differentiators` | Eight objection-handlers, each answering one specific fear. | Eight defaults ship, each written against a named client fear. |
 
