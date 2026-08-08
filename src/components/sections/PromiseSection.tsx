@@ -3,6 +3,7 @@ import { Check, ShieldCheck } from 'lucide-react';
 import { promiseIntro, promises } from '@/data/philosophy';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { pad2 } from '@/lib/utils';
 import { Section, SectionHeading } from '@/components/common/Section';
@@ -107,9 +108,7 @@ export function PromiseSection() {
           <Reveal preset="up">
             <div className="mt-14 flex flex-col items-center gap-5 border-t border-border pt-12 text-center">
               <p className="max-w-xl text-[0.95rem] text-ink-muted">
-                {t(
-                  'These commitments appear in the agreement we sign with you — not only on this page.',
-                )}
+                {t(copyConfig.home.promise.closing)}
               </p>
               <Button asChild size="lg">
                 <Link to={routes.contact}>{siteConfig.cta.primary}</Link>

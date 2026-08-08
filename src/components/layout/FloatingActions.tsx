@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { ArrowUp, MessageCircle, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { telLink, whatsappLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
 import { cn } from '@/lib/utils';
@@ -115,7 +116,7 @@ export function FloatingActions() {
   const call = telLink();
   const whatsapp = whatsappLink();
   const { features } = siteConfig;
-  const businessName = t(siteConfig.business.name);
+  const copy = copyConfig.floating;
 
   const scrollToTop = () => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -139,8 +140,8 @@ export function FloatingActions() {
             >
               <FloatingButton
                 onClick={scrollToTop}
-                label="Top"
-                ariaLabel="Scroll back to top of page"
+                label={copy.backToTop}
+                ariaLabel={copy.backToTopAria}
                 className="border border-border bg-surface text-ink hover:bg-ink hover:text-canvas"
               >
                 <ArrowUp className="size-5" strokeWidth={1.6} />
@@ -155,7 +156,7 @@ export function FloatingActions() {
         <FloatingButton
           href={call.href}
           label={siteConfig.cta.call}
-          ariaLabel={`Call ${businessName}`}
+          ariaLabel={t(copy.callAria)}
           className="bg-ink text-canvas hover:bg-accent-button hover:text-accent-contrast"
         >
           <Phone className="size-5" strokeWidth={1.6} />
@@ -174,7 +175,7 @@ export function FloatingActions() {
             href={whatsapp.href}
             external={whatsapp.external}
             label={siteConfig.cta.whatsapp}
-            ariaLabel={`Message ${businessName} on WhatsApp`}
+            ariaLabel={t(copy.whatsappAria)}
             className="bg-[#25D366] text-ink hover:bg-[#1EBE5A]"
           >
             <MessageCircle className="size-5" strokeWidth={1.7} />

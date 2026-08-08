@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Home, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { primaryNav } from '@/data/navigation';
 import { telLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
@@ -26,6 +27,8 @@ import { routes } from '@/config/routes';
  * transparent navbar continues to read correctly.
  * ============================================================================
  */
+const copy = copyConfig.pages.notFound;
+
 export default function NotFound() {
   const page = siteConfig.seo.pages.notFound;
   const call = telLink();
@@ -50,7 +53,7 @@ export default function NotFound() {
         <Container className="relative z-10">
           <div className="max-w-3xl">
             <Reveal preset="tight">
-              <span className="eyebrow eyebrow--light">Error 404</span>
+              <span className="eyebrow eyebrow--light">{copy.eyebrow}</span>
             </Reveal>
 
             <Reveal preset="up" delay={0.06}>
@@ -64,16 +67,12 @@ export default function NotFound() {
 
             <Reveal preset="up" delay={0.1}>
               <h1 className="-mt-10 font-display text-h1 text-contrast-ink md:-mt-16">
-                This page has been rearranged.
+                {t(copy.title)}
               </h1>
             </Reveal>
 
             <Reveal preset="up" delay={0.16}>
-              <p className="mt-6 max-w-xl text-lead text-contrast-ink/68">
-                {t(
-                  'The page you were looking for has moved or no longer exists. Here is the quickest way back to what you probably came for.',
-                )}
-              </p>
+              <p className="mt-6 max-w-xl text-lead text-contrast-ink/68">{t(copy.lead)}</p>
             </Reveal>
 
             {/* ---- Actions ---- */}
@@ -82,7 +81,7 @@ export default function NotFound() {
                 <Button asChild size="lg">
                   <Link to={routes.home}>
                     <Home className="size-4" strokeWidth={1.7} />
-                    Back to Home
+                    {copy.homeAction}
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="light">

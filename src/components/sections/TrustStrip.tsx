@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Pause, Play } from 'lucide-react';
 import { trustMarkers } from '@/data/stats';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { cn } from '@/lib/utils';
 
@@ -149,7 +150,7 @@ export function TrustStrip() {
         )}
       >
         <span className="sr-only">
-          {paused ? 'Play the scrolling list of credentials' : 'Pause the scrolling list of credentials'}
+          {paused ? copyConfig.home.trustStrip.play : copyConfig.home.trustStrip.pause}
         </span>
         {paused ? (
           <Play aria-hidden="true" className="size-3.5" strokeWidth={1.8} />

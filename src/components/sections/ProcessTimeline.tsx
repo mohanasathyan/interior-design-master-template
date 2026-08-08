@@ -5,7 +5,9 @@ import { ArrowRight } from 'lucide-react';
 import { processSteps } from '@/data/process';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { useMediaQuery, usePrefersReducedMotion } from '@/hooks';
 import { Section, SectionHeading } from '@/components/common/Section';
@@ -33,6 +35,8 @@ import { routes } from '@/config/routes';
  * costs one transform no matter how many steps are added.
  * ============================================================================
  */
+const copy = copyConfig.home.process;
+
 export function ProcessTimeline() {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = usePrefersReducedMotion();
@@ -61,9 +65,9 @@ export function ProcessTimeline() {
   return (
     <Section id={homeSections.process} tone="contrast" spacing="xl" grain>
       <SectionHeading
-        eyebrow="How We Work"
-        title="Six stages. Every one of them written down."
-        lead="No interior project should be a leap of faith. This is exactly how yours will run — what happens at each stage, what you receive at the end of it, and how long it takes."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        lead={copy.lead}
         align="center"
         tone="light"
         maxWidth="max-w-3xl"
@@ -125,7 +129,9 @@ export function ProcessTimeline() {
                         !right && 'lg:justify-end',
                       )}
                     >
-                      <span className="tabular-nums">Step {step.number}</span>
+                      <span className="tabular-nums">
+                        {format(copy.step, { number: step.number })}
+                      </span>
                       <span aria-hidden="true" className="h-px w-8 bg-accent/40" />
                       <span className="token-safe text-contrast-ink/60">{t(step.duration)}</span>
                     </span>
@@ -145,7 +151,7 @@ export function ProcessTimeline() {
                         !right && 'lg:border-l-0 lg:border-r-2 lg:pl-0 lg:pr-4',
                       )}
                     >
-                      <span className="font-medium text-contrast-ink">You receive: </span>
+                      <span className="font-medium text-contrast-ink">{copy.deliverable}</span>
                       {t(step.deliverable)}
                     </p>
                   </div>
@@ -160,13 +166,9 @@ export function ProcessTimeline() {
       <Reveal preset="up">
         <div className="mt-20 flex flex-col items-center gap-6 border-t border-white/10 pt-14 text-center">
           <h3 className="max-w-2xl font-display text-h3 text-contrast-ink">
-            {t('Stage one is a conversation, and it is free.')}
+            {t(copy.closingTitle)}
           </h3>
-          <p className="max-w-xl text-contrast-ink/62">
-            {t(
-              'Tell us about your space and we will walk you through what is realistic for your budget and timeline — with no obligation to proceed.',
-            )}
-          </p>
+          <p className="max-w-xl text-contrast-ink/62">{t(copy.closingLead)}</p>
           <Button asChild size="lg" variant="inverse">
             <Link to={routes.contact}>
               {siteConfig.cta.primary}

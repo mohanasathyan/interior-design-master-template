@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { studioStats } from '@/data/stats';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { RevealGroup, RevealItem } from '@/components/common/Reveal';
@@ -22,6 +23,8 @@ import { routes } from '@/config/routes';
  * as a considered composition instead of a dashboard.
  * ============================================================================
  */
+const copy = copyConfig.home.stats;
+
 export function StatsBand() {
   return (
     <Section
@@ -34,14 +37,14 @@ export function StatsBand() {
         {/* ---- Left: framing ---- */}
         <div className="lg:col-span-5">
           <SectionHeading
-            eyebrow="The Studio at a Glance"
-            title="A decade of homes, delivered on time and on budget."
-            lead="Numbers are the shortest route to trust in this profession. These are ours — and every one of them is verifiable in the projects we have completed across {{CITY}}."
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            lead={copy.lead}
             maxWidth="max-w-xl"
           >
             <Button asChild variant="outline" size="md">
               <Link to={routes.about}>
-                Read Our Story
+                {copy.action}
                 <ArrowRight
                   className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
                   strokeWidth={1.7}
@@ -66,15 +69,11 @@ export function StatsBand() {
 
       {/* A quiet line of reassurance beneath, rather than another CTA button. */}
       <p className="mt-14 border-t border-border pt-8 text-sm text-ink-muted">
-        {t(
-          'Every project is delivered by our own in-house team — designers, project managers and craftspeople on our payroll, not subcontracted out. Questions? Call {{PHONE}} and speak to a designer directly.',
-        )}
+        {t(copy.footnote)}
       </p>
 
       {/* Screen-reader-only context for the figures above. */}
-      <span className="sr-only">
-        {t(`Statistics for ${siteConfig.business.name}, interior designers in {{CITY}}.`)}
-      </span>
+      <span className="sr-only">{t(copy.screenReaderSummary)}</span>
     </Section>
   );
 }

@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Layout } from '@/components/layout/Layout';
+import { copyConfig } from '@/config/copy.config';
 
 /**
  * ============================================================================
@@ -43,7 +44,7 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 function RouteFallback() {
   return (
     <div className="grid min-h-svh place-items-center bg-canvas" role="status" aria-live="polite">
-      <span className="sr-only">Loading page…</span>
+      <span className="sr-only">{copyConfig.system.loading}</span>
       <span
         aria-hidden="true"
         className="size-8 animate-appear-late rounded-full border border-border border-t-accent"

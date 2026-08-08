@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { siteConfig } from '@/config/site.config';
+import { shellCopy } from '@/config/shell.config';
 import { absoluteUrl } from '@/lib/links';
 import { isFilled, tClean } from '@/lib/tokens';
 import { localBusinessSchema, websiteSchema } from '@/lib/schema';
@@ -117,7 +118,8 @@ export function Seo({
       ? tClean(seo.defaultTitle) || tClean(business.name)
       : tClean(seo.titleTemplate.replace('%s', rawTitle));
 
-    const finalTitle = composed || rawTitle || 'Interior Design Studio';
+    /* Same fallback the build-time head injector uses — see shell.config.ts. */
+    const finalTitle = composed || rawTitle || shellCopy.fallbackTitle;
     const finalDescription = tClean(description) || tClean(seo.defaultDescription);
     const canonical = absoluteUrl(path);
     const shareImage = image ?? (isFilled(seo.ogImage) ? seo.ogImage : undefined);

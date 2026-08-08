@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, m } from 'framer-motion';
 import { ArrowRight, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { hasDarkHero, primaryNav } from '@/data/navigation';
 import { telLink, whatsappLink } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
@@ -32,6 +33,8 @@ import { routes } from '@/config/routes';
  *  • `NavLink` supplies `aria-current="page"` for the active route.
  * ============================================================================
  */
+const { ui } = copyConfig;
+
 export function Navbar() {
   const scrolled = useScrolled(32);
   const [open, setOpen] = useState(false);
@@ -116,7 +119,7 @@ export function Navbar() {
     <>
       {/* Skip link — the first thing a keyboard user reaches on every page. */}
       <a href="#main-content" className="skip-link">
-        Skip to main content
+        {ui.skipToContent}
       </a>
 
       <header
@@ -162,7 +165,7 @@ export function Navbar() {
             <Logo tone={solid ? 'default' : 'light'} compact className="shrink-0" />
 
             {/* ---------------- Desktop navigation ---------------- */}
-            <nav aria-label="Primary" className="hidden lg:block">
+            <nav aria-label={ui.primaryNavLabel} className="hidden lg:block">
               {/*
                 The nav is the only group here that can give width back without
                 losing information, so it is where the space comes from. Four
@@ -287,7 +290,7 @@ export function Navbar() {
                 onClick={() => setOpen((value) => !value)}
                 aria-expanded={open}
                 aria-controls="mobile-navigation"
-                aria-label={open ? 'Close menu' : 'Open menu'}
+                aria-label={open ? ui.closeMenu : ui.openMenu}
                 className={cn(
                   'grid size-11 place-items-center rounded-(--radius-brand) transition-colors duration-300',
                   solid
@@ -314,7 +317,7 @@ export function Navbar() {
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Site navigation"
+            aria-label={ui.drawerLabel}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -322,7 +325,7 @@ export function Navbar() {
             className="fixed inset-0 z-80 flex flex-col bg-canvas pt-20 lg:hidden"
           >
             <Container className="flex flex-1 flex-col overflow-y-auto pb-10">
-              <nav aria-label="Mobile" className="mt-6 flex-1">
+              <nav aria-label={ui.mobileNavLabel} className="mt-6 flex-1">
                 <ul className="flex flex-col">
                   {primaryNav.map((item, index) => (
                     <m.li
@@ -384,7 +387,7 @@ export function Navbar() {
                       rel={whatsapp.external ? 'noopener noreferrer' : undefined}
                     >
                       <MessageCircle className="size-4" strokeWidth={1.6} />
-                      WhatsApp
+                      {ui.drawerWhatsapp}
                     </a>
                   </Button>
                 </div>

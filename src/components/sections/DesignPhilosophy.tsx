@@ -2,6 +2,7 @@ import { Quote } from 'lucide-react';
 import { philosophyIntro, principles } from '@/data/philosophy';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { Section } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
@@ -61,12 +62,10 @@ export function DesignPhilosophy() {
               <figure className="mt-10 border-l-2 border-accent pl-6">
                 <Quote className="size-6 text-accent-strong/45" strokeWidth={1.3} aria-hidden="true" />
                 <blockquote className="mt-4 font-display text-xl leading-snug text-ink md:text-2xl">
-                  {t(
-                    '“A home should not look like it was decorated. It should look like it was always meant to be this way.”',
-                  )}
+                  {t(copyConfig.home.philosophy.quote)}
                 </blockquote>
                 <figcaption className="mt-4 text-[0.68rem] uppercase tracking-[0.2em] text-ink-muted">
-                  {t('{{FOUNDER_NAME}} — {{FOUNDER_ROLE}}')}
+                  {t(copyConfig.home.philosophy.attribution)}
                 </figcaption>
               </figure>
             </Reveal>

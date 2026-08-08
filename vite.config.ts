@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
 import { siteConfig } from './src/config/site.config';
+// Deliberately NOT copy.config.ts — see the note in shell.config.ts.
+import { shellCopy } from './src/config/shell.config';
 import { tClean, isFilled, tokenKeys } from './src/lib/tokens';
 import {
   IMAGE_CDN_ORIGIN,
@@ -73,7 +75,7 @@ function shareImage(): string | undefined {
 
 function buildHeadTags(): string {
   const name = tClean(siteConfig.business.name);
-  const title = tClean(siteConfig.seo.defaultTitle) || name || 'Interior Design Studio';
+  const title = tClean(siteConfig.seo.defaultTitle) || name || shellCopy.fallbackTitle;
   const description = tClean(siteConfig.seo.defaultDescription);
   const image = shareImage();
   const locale = siteConfig.seo.locale;
@@ -206,6 +208,38 @@ function seoHtmlPlugin(): Plugin {
       },
     },
   };
+}
+
+/**
+ * Injects the pre-React shell copy — the boot failsafe and the `<noscript>`
+ * notice — from `src/config/shell.config.ts`.
+ *
+ * Separate from `seoHtmlPlugin` because it answers a different question. That
+ * one bakes in metadata for scrapers; this one is the only copy a visitor can
+ * read when the application itself never runs, and it is escaped and injected
+ * here so `index.html` stays a file nobody has to edit when cloning.
+ */
+function shellHtmlPlugin(): Plugin {
+  return {
+    name: 'luxe:shell-html',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        const fallback =
+          `${escapeText(shellCopy.bootFallback)} ` +
+          `<a href="/">${escapeText(shellCopy.bootFallbackLink)}</a>`;
+
+        return html
+          .replace('<!-- SHELL:BOOT_FALLBACK -->', fallback)
+          .replace('<!-- SHELL:NOSCRIPT -->', escapeText(shellCopy.noscript));
+      },
+    },
+  };
+}
+
+/** HTML-escape a value destined for a text node. */
+function escapeText(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
@@ -508,7 +542,14 @@ function crawlFilesPlugin(): Plugin {
  * - CSS + JS are minified by esbuild in `vite build`.
  */
 export default defineConfig({
-  plugins: [react(), tailwindcss(), seoHtmlPlugin(), crawlFilesPlugin(), tokenValidationPlugin()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    seoHtmlPlugin(),
+    shellHtmlPlugin(),
+    crawlFilesPlugin(),
+    tokenValidationPlugin(),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

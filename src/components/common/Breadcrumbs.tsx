@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { t } from '@/lib/tokens';
+import { copyConfig } from '@/config/copy.config';
 import type { Crumb } from '@/lib/schema';
 
 /**
@@ -25,7 +26,7 @@ export function Breadcrumbs({
   const light = tone === 'light';
 
   return (
-    <nav aria-label="Breadcrumb" className={cn('w-full', className)}>
+    <nav aria-label={copyConfig.ui.breadcrumbLabel} className={cn('w-full', className)}>
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.72rem] tracking-[0.14em] uppercase">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

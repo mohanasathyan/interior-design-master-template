@@ -3,9 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, m } from 'framer-motion';
 import { AlertCircle, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { serviceOptions } from '@/data/services';
 import { projects } from '@/data/projects';
 import { isFilled, t } from '@/lib/tokens';
+import { format, formatNodes } from '@/lib/copy';
 import { ANALYTICS_EVENTS, trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -62,20 +64,23 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 const PHONE_PATTERN = /^[+()\d][\d\s\-()]{7,19}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+/** Every word this form says, from `src/config/copy.config.ts`. */
+const copy = copyConfig.form;
+
 function validate(values: Record<FieldName, string>): Errors {
   const errors: Errors = {};
+  const message = copy.validation;
 
-  if (!values.name.trim()) errors.name = 'Please tell us your name.';
-  else if (values.name.trim().length < 2) errors.name = 'Please enter your full name.';
+  if (!values.name.trim()) errors.name = message.nameRequired;
+  else if (values.name.trim().length < 2) errors.name = message.nameTooShort;
 
-  if (!values.phone.trim()) errors.phone = 'A phone number lets us call you back.';
-  else if (!PHONE_PATTERN.test(values.phone.trim()))
-    errors.phone = 'Please check the phone number.';
+  if (!values.phone.trim()) errors.phone = message.phoneRequired;
+  else if (!PHONE_PATTERN.test(values.phone.trim())) errors.phone = message.phoneInvalid;
 
   if (values.email.trim() && !EMAIL_PATTERN.test(values.email.trim()))
-    errors.email = 'Please check the email address.';
+    errors.email = message.emailInvalid;
 
-  if (!values.service) errors.service = 'Choose the service you are interested in.';
+  if (!values.service) errors.service = message.serviceRequired;
 
   return errors;
 }
@@ -127,7 +132,7 @@ export function ContactForm() {
     setValues((current) => ({
       ...current,
       /* Only seed the message if the visitor has not started typing. */
-      message: current.message || t(`I'd like something similar to "${project.name}". `),
+      message: current.message || t(format(copy.projectPrefill, { project: project.name })),
     }));
   }, [preselectedProject]);
 
@@ -214,11 +219,7 @@ export function ContactForm() {
       setTouched({});
     } catch {
       setStatus('error');
-      setSubmitMessage(
-        t(
-          'Something went wrong sending your enquiry. Please call {{PHONE}} or message us on WhatsApp and we will pick it up straight away.',
-        ),
-      );
+      setSubmitMessage(t(copy.errorMessage));
     }
   };
 
@@ -241,14 +242,17 @@ export function ContactForm() {
       >
         <IconChip icon={CheckCircle2} size="xl" strokeWidth={1.3} />
 
-        <h3 className="mt-7 font-display text-h3 text-ink">Thank you — enquiry received.</h3>
+        <h3 className="mt-7 font-display text-h3 text-ink">{t(copy.successTitle)}</h3>
 
         <p className="mt-4 max-w-md text-ink-muted">{submitMessage}</p>
 
         {demoMode && (
           <p className="mt-6 rounded-(--radius-brand) border border-border bg-canvas px-4 py-3 text-[0.78rem] text-ink-muted">
-            Demo mode — set <code className="text-accent-strong">forms.endpoint</code> in
-            <code className="text-accent-strong"> site.config.ts</code> to start receiving real enquiries.
+            {copyConfig.developer.formDemoSuccess.label}{' '}
+            {formatNodes(copyConfig.developer.formDemoSuccess.detail, {
+              field: <code className="text-accent-strong">forms.endpoint</code>,
+              file: <code className="text-accent-strong">site.config.ts</code>,
+            })}
           </p>
         )}
 
@@ -261,7 +265,7 @@ export function ContactForm() {
             setSubmitMessage('');
           }}
         >
-          Send another enquiry
+          {copy.sendAnother}
         </Button>
       </m.div>
     );
@@ -275,12 +279,8 @@ export function ContactForm() {
       className="rounded-(--radius-brand) border border-border bg-surface p-8 md:p-10"
     >
       <div className="flex flex-col gap-1.5">
-        <h2 className="font-display text-h3 text-ink">Request your free consultation</h2>
-        <p className="text-[0.93rem] text-ink-muted">
-          {t(
-            'Three quick details is all we need to get started. Everything else is optional — but the more you tell us, the more useful our first reply will be.',
-          )}
-        </p>
+        <h2 className="font-display text-h3 text-ink">{t(copy.title)}</h2>
+        <p className="text-[0.93rem] text-ink-muted">{t(copy.lead)}</p>
       </div>
 
       {/* Honeypot: visually hidden, never focusable, ignored by autofill. */}
@@ -298,7 +298,7 @@ export function ContactForm() {
         {/* ---- Name ---- */}
         <Field
           id="name"
-          label="Your name"
+          label={copy.fields.name.label}
           required
           error={touched.name ? errors.name : undefined}
         >
@@ -306,7 +306,7 @@ export function ContactForm() {
             id="field-name"
             name="name"
             autoComplete="name"
-            placeholder="e.g. Priya Sharma"
+            placeholder={copy.fields.name.placeholder}
             value={values.name}
             invalid={Boolean(touched.name && errors.name)}
             aria-describedby={errors.name ? 'error-name' : undefined}
@@ -319,10 +319,10 @@ export function ContactForm() {
         {/* ---- Phone ---- */}
         <Field
           id="phone"
-          label="Phone number"
+          label={copy.fields.phone.label}
           required
           error={touched.phone ? errors.phone : undefined}
-          hint="We will call you back, not add you to a list."
+          hint={copy.fields.phone.hint}
         >
           <Input
             id="field-phone"
@@ -330,7 +330,7 @@ export function ContactForm() {
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            placeholder="e.g. +91 98765 43210"
+            placeholder={copy.fields.phone.placeholder}
             value={values.phone}
             invalid={Boolean(touched.phone && errors.phone)}
             aria-describedby={errors.phone ? 'error-phone' : 'hint-phone'}
@@ -341,14 +341,18 @@ export function ContactForm() {
         </Field>
 
         {/* ---- Email ---- */}
-        <Field id="email" label="Email address" error={touched.email ? errors.email : undefined}>
+        <Field
+          id="email"
+          label={copy.fields.email.label}
+          error={touched.email ? errors.email : undefined}
+        >
           <Input
             id="field-email"
             name="email"
             type="email"
             inputMode="email"
             autoComplete="email"
-            placeholder="e.g. priya@example.com"
+            placeholder={copy.fields.email.placeholder}
             value={values.email}
             invalid={Boolean(touched.email && errors.email)}
             aria-describedby={errors.email ? 'error-email' : undefined}
@@ -360,7 +364,7 @@ export function ContactForm() {
         {/* ---- Service ---- */}
         <Field
           id="service"
-          label="Service you are interested in"
+          label={copy.fields.service.label}
           required
           error={touched.service ? errors.service : undefined}
         >
@@ -377,7 +381,7 @@ export function ContactForm() {
               invalid={Boolean(touched.service && errors.service)}
               aria-describedby={errors.service ? 'error-service' : undefined}
             >
-              <SelectValue placeholder="Choose a service" />
+              <SelectValue placeholder={copy.fields.service.placeholder} />
             </SelectTrigger>
             <SelectContent>
               {serviceOptions.map((option) => (
@@ -392,8 +396,8 @@ export function ContactForm() {
         {/* ---- Budget ---- */}
         <Field
           id="budget"
-          label="Approximate budget"
-          hint="An honest range helps us design to it, not over it."
+          label={copy.fields.budget.label}
+          hint={copy.fields.budget.hint}
         >
           <Select
             value={values.budget || undefined}
@@ -401,7 +405,7 @@ export function ContactForm() {
             name="budget"
           >
             <SelectTrigger id="field-budget" aria-describedby="hint-budget">
-              <SelectValue placeholder="Select a range" />
+              <SelectValue placeholder={copy.fields.budget.placeholder} />
             </SelectTrigger>
             <SelectContent>
               {siteConfig.forms.budgetOptions.map((option) => (
@@ -414,7 +418,7 @@ export function ContactForm() {
         </Field>
 
         {/* ---- Preferred date ---- */}
-        <Field id="date" label="Preferred consultation date">
+        <Field id="date" label={copy.fields.date.label}>
           <Input
             id="field-date"
             name="date"
@@ -430,14 +434,14 @@ export function ContactForm() {
         <div className="sm:col-span-2">
           <Field
             id="message"
-            label="Tell us about your space"
-            hint="Property type, carpet area, rooms involved, timeline — anything helps."
+            label={copy.fields.message.label}
+            hint={copy.fields.message.hint}
           >
             <Textarea
               id="field-message"
               name="message"
               rows={4}
-              placeholder="e.g. 3 BHK apartment, around 1,400 sq ft. We need the kitchen, both wardrobes and the living room done before we move in this December."
+              placeholder={copy.fields.message.placeholder}
               value={values.message}
               aria-describedby="hint-message"
               onChange={(event) => setField('message', event.target.value)}
@@ -477,14 +481,12 @@ export function ContactForm() {
             icon stays aligned to the first line.
           */}
           <span>
-            {t(
-              'Your details stay with our design team. No spam, no reselling, and no sales calls out of the blue.',
-            )}{' '}
+            {t(copy.privacyNote)}{' '}
             <Link
               to={routes.privacy}
               className="link-underline whitespace-nowrap text-accent-strong transition-colors duration-300 hover:text-ink"
             >
-              Privacy Policy
+              {copy.privacyLink}
             </Link>
           </span>
         </p>
@@ -498,11 +500,11 @@ export function ContactForm() {
           {status === 'submitting' ? (
             <>
               <Loader2 className="size-4 animate-spin" strokeWidth={2} />
-              Sending…
+              {copy.submitting}
             </>
           ) : (
             <>
-              Send Enquiry
+              {copy.submit}
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1.5"
                 strokeWidth={1.7}
@@ -514,8 +516,11 @@ export function ContactForm() {
 
       {demoMode && (
         <p className="mt-6 text-[0.76rem] text-ink-muted">
-          <span className="text-accent-strong">Demo mode:</span> submissions are simulated. Set{' '}
-          <code>forms.endpoint</code> in <code>site.config.ts</code> to go live.
+          <span className="text-accent-strong">{copyConfig.developer.formDemoFooter.label}</span>{' '}
+          {formatNodes(copyConfig.developer.formDemoFooter.detail, {
+            field: <code>forms.endpoint</code>,
+            file: <code>site.config.ts</code>,
+          })}
         </p>
       )}
     </form>

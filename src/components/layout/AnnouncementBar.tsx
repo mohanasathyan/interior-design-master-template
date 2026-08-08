@@ -3,6 +3,7 @@ import { AnimatePresence, m } from 'framer-motion';
 import { ArrowRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { Container } from '@/components/common/Section';
 import { routes } from '@/config/routes';
@@ -56,7 +57,7 @@ export function AnnouncementBar({ collapsed }: { collapsed: boolean }) {
               <button
                 type="button"
                 onClick={() => setDismissed(true)}
-                aria-label="Dismiss announcement"
+                aria-label={copyConfig.ui.dismissAnnouncement}
                 className="absolute right-4 grid size-7 place-items-center text-contrast-ink/60 transition-colors duration-300 hover:text-contrast-ink sm:right-8"
               >
                 <X className="size-3.5" strokeWidth={1.5} />

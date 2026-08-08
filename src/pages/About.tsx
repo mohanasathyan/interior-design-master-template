@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, Clock, MessageSquare, Phone, Quote, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, Phone, Quote } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { clientReasons, founder, milestones, mission, story, values, vision } from '@/data/about';
 import { qualityStandards } from '@/data/philosophy';
 import { studioStats } from '@/data/stats';
@@ -39,6 +40,8 @@ const CRUMBS: Crumb[] = [
   { name: 'About', path: routes.about },
 ];
 
+const copy = copyConfig.pages.about;
+
 export default function About() {
   const page = siteConfig.seo.pages.about;
   const call = telLink();
@@ -56,16 +59,13 @@ export default function About() {
       />
 
       <PageHero
-        eyebrow="About the Studio"
-        title="The people who will be looking after your home."
-        lead="We are a design and execution studio in {{CITY}} — designers, project managers and craftspeople under one roof, accountable for the whole journey from first sketch to final handover."
+        eyebrow={copy.hero.eyebrow}
+        title={copy.hero.title}
+        lead={copy.hero.lead}
         image={siteConfig.media.pageHeaders.about}
         crumbs={CRUMBS}
-        assurances={[
-          { icon: MessageSquare, text: 'Free consultation and site visit' },
-          { icon: ShieldCheck, text: 'No obligation, no pressure' },
-          { icon: Clock, text: 'A reply within one working day' },
-        ]}
+        /* The same list the closing call to action renders — see copy.config.ts. */
+        assurances={copyConfig.assurances}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
@@ -103,10 +103,10 @@ export default function About() {
             <Reveal preset="up" delay={0.28}>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Button asChild size="md">
-                  <Link to={routes.projects}>See Our Work</Link>
+                  <Link to={routes.projects}>{copy.story.primaryAction}</Link>
                 </Button>
                 <Button asChild size="md" variant="outline">
-                  <Link to={routes.services}>What We Offer</Link>
+                  <Link to={routes.services}>{copy.story.secondaryAction}</Link>
                 </Button>
               </div>
             </Reveal>
@@ -188,9 +188,9 @@ export default function About() {
       {/* ================= Values ================= */}
       <Section tone="canvas" spacing="lg" backdrop={siteConfig.media.backdrops.soft}>
         <SectionHeading
-          eyebrow="Our Values"
-          title="Four things we will not trade away."
-          lead="Values are only meaningful when they cost something. Each of these has, at some point, cost us a project — and we would make the same call again."
+          eyebrow={copy.values.eyebrow}
+          title={copy.values.title}
+          lead={copy.values.lead}
           align="center"
           maxWidth="max-w-2xl"
         />
@@ -228,7 +228,7 @@ export default function About() {
 
           <div className="lg:col-span-7">
             <Reveal preset="tight">
-              <span className="eyebrow">A Word From Our Founder</span>
+              <span className="eyebrow">{copy.founder.eyebrow}</span>
             </Reveal>
 
             <Reveal preset="up" delay={0.06}>
@@ -267,9 +267,9 @@ export default function About() {
       {/* ================= Milestones ================= */}
       <Section tone="canvas" spacing="lg">
         <SectionHeading
-          eyebrow="Our Journey"
-          title="How the studio grew."
-          lead="A short history of the decisions that shaped how we work today."
+          eyebrow={copy.milestones.eyebrow}
+          title={copy.milestones.title}
+          lead={copy.milestones.lead}
           maxWidth="max-w-2xl"
         />
 
@@ -317,9 +317,9 @@ export default function About() {
       {/* ================= Quality standards ================= */}
       <Section tone="muted" spacing="lg" backdrop={siteConfig.media.backdrops.warm}>
         <SectionHeading
-          eyebrow="Quality Standards"
-          title="What “finished properly” means to us."
-          lead="Quality is not a claim, it is a set of checks. These are the ones every project passes through before we hand over the keys."
+          eyebrow={copy.quality.eyebrow}
+          title={copy.quality.title}
+          lead={copy.quality.lead}
           align="center"
           maxWidth="max-w-2xl"
         />
@@ -342,9 +342,9 @@ export default function About() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <SectionHeading
-              eyebrow="Why Clients Choose Us"
-              title="Eight reasons people pick this studio over a cheaper quote."
-              lead="None of these are unique ideas. What is unusual is finding all eight in the same studio — and getting them in writing."
+              eyebrow={copy.reasons.eyebrow}
+              title={copy.reasons.title}
+              lead={copy.reasons.lead}
               maxWidth="max-w-lg"
             >
               <Button asChild size="lg">

@@ -14,10 +14,12 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { staticFiles } from '@/config/routes';
 import { footerCompanyLinks, footerServiceLinks, legalNav } from '@/data/navigation';
 import { formattedAddress, groupedHours, mailLink, mapLink, reviewLink, socialLinks, telLink, whatsappLink } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { Container } from '@/components/common/Section';
 import { Button } from '@/components/ui/button';
@@ -50,6 +52,8 @@ const SOCIAL_ICONS: Record<string, LucideIcon> = {
 
 /* `groupedHours` now lives in `@/lib/links` so the footer and the contact page
    render opening hours from one implementation in one format. */
+
+const copy = copyConfig.footer;
 
 export function Footer() {
   const call = telLink();
@@ -84,7 +88,7 @@ export function Footer() {
             {socials.length > 0 && (
               <div className="mt-8">
                 <span className="text-[0.62rem] font-medium uppercase tracking-[0.22em] text-contrast-ink/60">
-                  Follow our work
+                  {copy.socialHeading}
                 </span>
                 <ul className="mt-4 flex flex-wrap items-center gap-3">
                   {socials.map((social) => {
@@ -125,7 +129,9 @@ export function Footer() {
                           href={social.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`${t(siteConfig.business.name)} on ${social.label}`}
+                          aria-label={t(
+                            format(copyConfig.ui.socialProfile, { platform: social.label }),
+                          )}
                           className={cn(
                             shell,
                             'transition-all duration-500 ease-luxe',
@@ -153,15 +159,15 @@ export function Footer() {
                     <Star key={index} className="size-3.5 fill-accent text-accent" />
                   ))}
                 </span>
-                <span className="link-underline">Read our Google reviews</span>
+                <span className="link-underline">{copy.reviewLink}</span>
               </a>
             )}
           </div>
 
           {/* ---- Services ---- */}
-          <nav aria-label="Services" className="min-w-0 lg:col-span-2">
+          <nav aria-label={copy.servicesHeading} className="min-w-0 lg:col-span-2">
             <h2 className="font-body text-[0.62rem] font-medium uppercase tracking-[0.22em] text-accent">
-              Services
+              {copy.servicesHeading}
             </h2>
             {/*
               All thirteen services, so every service page has an internal link
@@ -191,9 +197,9 @@ export function Footer() {
           </nav>
 
           {/* ---- Studio ---- */}
-          <nav aria-label="Studio" className="min-w-0 lg:col-span-2">
+          <nav aria-label={copy.studioHeading} className="min-w-0 lg:col-span-2">
             <h2 className="font-body text-[0.62rem] font-medium uppercase tracking-[0.22em] text-accent">
-              Studio
+              {copy.studioHeading}
             </h2>
             {/* Two columns on a tablet only: these labels are long enough
                 ("Frequently Asked Questions") that a phone-width pair would
@@ -215,7 +221,7 @@ export function Footer() {
           {/* ---- Contact ---- */}
           <div className="lg:col-span-4">
             <h2 className="font-body text-[0.62rem] font-medium uppercase tracking-[0.22em] text-accent">
-              Visit or call us
+              {copy.contactHeading}
             </h2>
 
             <ul className="mt-6 flex flex-col gap-5">
@@ -324,7 +330,7 @@ export function Footer() {
         {areas.length > 0 && (
           <div className="border-t border-white/8 py-8">
             <h2 className="text-[0.62rem] font-medium uppercase tracking-[0.22em] text-contrast-ink/60">
-              Interior designers serving
+              {copy.serviceAreasHeading}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-contrast-ink/55">
               {areas.map((area, index) => (
@@ -340,7 +346,7 @@ export function Footer() {
         {/* ================= Legal bar ================= */}
         <div className="flex flex-col gap-4 border-t border-white/8 py-8 md:flex-row md:items-center md:justify-between">
           <p className="text-[0.8rem] text-contrast-ink/60">
-            © {year} {t(siteConfig.business.legalName)}. All rights reserved.
+            {t(format(copy.copyright, { year, name: siteConfig.business.legalName }))}
           </p>
 
           {/* These pointed at /contact, which implied a policy existed and then
@@ -368,7 +374,7 @@ export function Footer() {
                 href={staticFiles.sitemap}
                 className="link-underline transition-colors hover:text-accent"
               >
-                Sitemap
+                {copy.sitemap}
               </a>
             </li>
           </ul>

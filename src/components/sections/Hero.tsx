@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { heroStats } from '@/data/stats';
 import { homeSections } from '@/data/navigation';
 import { isFilled, t } from '@/lib/tokens';
@@ -50,7 +51,7 @@ export function Hero() {
   return (
     <section
       id={homeSections.hero}
-      aria-label="Introduction"
+      aria-label={copyConfig.home.heroLabel}
       /*
        * `min-h-svh`, not `92svh`. `svh` is the SMALL viewport height — the
        * height with the browser's chrome expanded — so a full `svh` is the

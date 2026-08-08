@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { ManagedImage } from '@/config/site.config.types';
+import { copyConfig } from '@/config/copy.config';
 import { isPlaceholder, tClean } from '@/lib/tokens';
 import { placeholderImage } from '@/lib/placeholder';
 import { buildSrcSet, formatSrcSet, mimeForFormat, primarySource } from '@/lib/images';
@@ -78,7 +79,7 @@ export function Img({
       return {
         src: placeholderImage({
           seed: image.src,
-          label: image.label ?? 'Image',
+          label: image.label ?? copyConfig.ui.imagePlaceholder,
           width: image.width ?? 1200,
           height: image.height ?? 900,
           tone,

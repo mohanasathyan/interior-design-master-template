@@ -3,8 +3,10 @@ import { ArrowRight, Phone } from 'lucide-react';
 import { featuredServices, services } from '@/data/services';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { telLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { RevealGroup, Reveal } from '@/components/common/Reveal';
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,8 @@ import { routes } from '@/config/routes';
  * the impatient visitor in the same block reliably lifts contact rates.
  * ============================================================================
  */
+const copy = copyConfig.home.services;
+
 export function ServicesOverview() {
   const call = telLink();
   const remaining = services.length - featuredServices.length;
@@ -32,9 +36,9 @@ export function ServicesOverview() {
     <Section id={homeSections.services} tone="muted" spacing="lg">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeading
-          eyebrow="What We Do"
-          title="Interiors designed, built and finished by one team."
-          lead="From a single room to a complete turnkey home, every service below is delivered end to end — design, materials, execution and styling — without a hand-off to another contractor."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          lead={copy.lead}
           maxWidth="max-w-2xl"
           className="lg:max-w-3xl"
         />
@@ -42,7 +46,7 @@ export function ServicesOverview() {
         <Reveal preset="up" delay={0.15} className="shrink-0">
           <Button asChild variant="outline" size="md">
             <Link to={routes.services}>
-              All {services.length} Services
+              {format(copy.allServices, { count: services.length })}
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
                 strokeWidth={1.7}
@@ -66,18 +70,14 @@ export function ServicesOverview() {
         <div className="mt-16 flex flex-col items-center gap-7 border-t border-border pt-14 text-center md:flex-row md:justify-between md:text-left">
           <div className="max-w-xl">
             <h3 className="font-display text-h3 text-ink">
-              {t(`Plus ${remaining} more specialist services.`)}
+              {t(format(copy.moreTitle, { count: remaining }))}
             </h3>
-            <p className="mt-3 text-ink-muted">
-              {t(
-                'False ceilings, lighting design, space planning, bespoke furniture, dining rooms and full home renovation — see the complete range, or simply tell us what you need.',
-              )}
-            </p>
+            <p className="mt-3 text-ink-muted">{t(copy.moreLead)}</p>
           </div>
 
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link to={routes.services}>Explore All Services</Link>
+              <Link to={routes.services}>{copy.exploreAll}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <a href={call.href}>

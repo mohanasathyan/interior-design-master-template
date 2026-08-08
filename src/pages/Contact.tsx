@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { breadcrumbSchema, faqSchema, webPageSchema, type Crumb } from '@/lib/schema';
 import { faqs } from '@/data/faqs';
 import {
@@ -29,6 +30,7 @@ import {
   whatsappLink,
 } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { useCopyToClipboard } from '@/hooks';
 import { Seo } from '@/components/common/Seo';
@@ -69,6 +71,8 @@ const SOCIAL_ICONS: Record<string, LucideIcon> = {
   x: Star,
 };
 
+const copy = copyConfig.pages.contact;
+
 export default function Contact() {
   const page = siteConfig.seo.pages.contact;
   const call = telLink();
@@ -77,7 +81,8 @@ export default function Contact() {
   const map = mapLink();
   const review = reviewLink();
   const socials = socialLinks();
-  const { copied, copy } = useCopyToClipboard();
+  /* Renamed on destructure: `copy` at module scope is this page's wording. */
+  const { copied, copy: copyToClipboard } = useCopyToClipboard();
 
   return (
     <>
@@ -93,9 +98,9 @@ export default function Contact() {
       />
 
       <PageHero
-        eyebrow="Get in Touch"
-        title="Let’s talk about your space."
-        lead="Call, message or send an enquiry — whichever suits you. The first consultation is free, carries no obligation, and usually tells you more in twenty minutes than a week of research."
+        eyebrow={copy.hero.eyebrow}
+        title={copy.hero.title}
+        lead={copy.hero.lead}
         image={siteConfig.media.pageHeaders.contact}
         crumbs={CRUMBS}
       />
@@ -105,16 +110,16 @@ export default function Contact() {
         <RevealGroup stagger={0.08} className="grid gap-6 md:grid-cols-3">
           <QuickCard
             icon={Phone}
-            eyebrow="Call the studio"
+            eyebrow={copy.cards.call.eyebrow}
             title={t(siteConfig.contact.phone)}
-            description="Speak to a designer directly. Fastest way to get an answer."
+            description={copy.cards.call.description}
             action={{ label: siteConfig.cta.call, href: call.href }}
             secondary={
               isFilled(siteConfig.contact.phone)
                 ? {
-                    label: copied ? 'Copied' : 'Copy number',
+                    label: copied ? copy.cards.call.copied : copy.cards.call.copyNumber,
                     icon: copied ? Check : Copy,
-                    onClick: () => void copy(t(siteConfig.contact.phone)),
+                    onClick: () => void copyToClipboard(t(siteConfig.contact.phone)),
                   }
                 : undefined
             }
@@ -122,9 +127,9 @@ export default function Contact() {
 
           <QuickCard
             icon={MessageCircle}
-            eyebrow="Message us"
-            title="WhatsApp"
-            description="Send photos of your space and we will reply with initial thoughts."
+            eyebrow={copy.cards.whatsapp.eyebrow}
+            title={copy.cards.whatsapp.title}
+            description={copy.cards.whatsapp.description}
             action={{
               label: siteConfig.cta.whatsapp,
               href: whatsapp.href,
@@ -136,10 +141,10 @@ export default function Contact() {
 
           <QuickCard
             icon={Mail}
-            eyebrow="Email the team"
+            eyebrow={copy.cards.email.eyebrow}
             title={t(siteConfig.contact.email)}
-            description="Best for drawings, floor plans and detailed briefs."
-            action={{ label: 'Send an email', href: mail.href }}
+            description={copy.cards.email.description}
+            action={{ label: copy.cards.email.action, href: mail.href }}
           />
         </RevealGroup>
       </Section>
@@ -156,9 +161,9 @@ export default function Contact() {
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-32">
               <SectionHeading
-                eyebrow="Visit the Studio"
-                title="Come and see the materials in person."
-                lead="Samples, finishes and hardware are all on display at our {{CITY}} studio. Drop in during opening hours, or book a slot so a designer is free to walk you through."
+                eyebrow={copy.studio.eyebrow}
+                title={copy.studio.title}
+                lead={copy.studio.lead}
                 maxWidth="max-w-lg"
               />
 
@@ -179,7 +184,7 @@ export default function Contact() {
               <Reveal preset="up" delay={0.14}>
                 <div className="mt-6 flex flex-col divide-y divide-border rounded-(--radius-brand) border border-border bg-surface">
                   {/* Address */}
-                  <DetailRow icon={MapPin} label="Studio address">
+                  <DetailRow icon={MapPin} label={copy.studio.addressLabel}>
                     <p className="text-[0.95rem] leading-relaxed text-ink">
                       {t(formattedAddress())}
                     </p>
@@ -189,7 +194,7 @@ export default function Contact() {
                       rel={map.external ? 'noopener noreferrer' : undefined}
                       className="link-underline mt-3 inline-flex items-center gap-1.5 text-[0.82rem] text-accent-strong"
                     >
-                      Get directions
+                      {copy.studio.directions}
                       <ExternalLink className="size-3" strokeWidth={1.8} aria-hidden="true" />
                     </a>
                   </DetailRow>
@@ -202,7 +207,7 @@ export default function Contact() {
                     them — and five identical Monday-to-Friday rows is four rows
                     of nothing a visitor needs to read.
                   */}
-                  <DetailRow icon={Clock} label="Opening hours">
+                  <DetailRow icon={Clock} label={copy.studio.hoursLabel}>
                     {/*
                       A CONTAINER query, not a viewport one. Whether the day and
                       its hours fit side by side depends on this card's width —
@@ -234,7 +239,7 @@ export default function Contact() {
                   </DetailRow>
 
                   {/* Phone + email */}
-                  <DetailRow icon={Phone} label="Direct lines">
+                  <DetailRow icon={Phone} label={copy.studio.linesLabel}>
                     <a
                       href={call.href}
                       className="block text-[0.95rem] tabular-nums text-ink transition-colors duration-300 hover:text-accent-strong"
@@ -256,19 +261,48 @@ export default function Contact() {
 
                   {/* Social */}
                   {socials.length > 0 && (
-                    <DetailRow icon={Instagram} label="Follow our work">
+                    <DetailRow icon={Instagram} label={copy.studio.socialLabel}>
                       <ul className="flex flex-wrap gap-2.5">
                         {socials.map((social) => {
                           const Icon = SOCIAL_ICONS[social.platform] ?? Star;
                           const pending = !isFilled(social.url);
+                          /* Same resting appearance either way — only the
+                             interactive affordances differ. */
+                          const shell =
+                            'grid size-11 place-items-center rounded-(--radius-brand) border border-border text-ink-muted';
+
+                          /*
+                            An unconfigured profile is INERT, exactly as it is in
+                            the footer. It used to link to /contact while still
+                            announcing itself as "…on Instagram", so a
+                            screen-reader user was told where they were going and
+                            then taken somewhere else — and the bare <a> threw
+                            away the SPA on the way.
+                          */
+                          if (pending) {
+                            return (
+                              <li key={social.platform}>
+                                <span aria-hidden="true" className={shell}>
+                                  <Icon className="size-4" strokeWidth={1.5} />
+                                </span>
+                              </li>
+                            );
+                          }
+
                           return (
                             <li key={social.platform}>
                               <a
-                                href={pending ? '/contact' : social.url}
-                                target={pending ? undefined : '_blank'}
-                                rel={pending ? undefined : 'noopener noreferrer'}
-                                aria-label={`${t(siteConfig.business.name)} on ${social.label}`}
-                                className="grid size-11 place-items-center rounded-(--radius-brand) border border-border text-ink-muted transition-all duration-500 ease-luxe hover:-translate-y-0.5 hover:border-accent hover:bg-accent-button hover:text-accent-contrast"
+                                href={social.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={t(
+                                  format(copyConfig.ui.socialProfile, { platform: social.label }),
+                                )}
+                                className={cn(
+                                  shell,
+                                  'transition-all duration-500 ease-luxe',
+                                  'hover:-translate-y-0.5 hover:border-accent hover:bg-accent-button hover:text-accent-contrast',
+                                )}
                               >
                                 <Icon className="size-4" strokeWidth={1.5} />
                               </a>
@@ -297,7 +331,7 @@ export default function Contact() {
                         ))}
                       </span>
                       <p className="mt-2.5 text-[0.9rem] text-ink">
-                        {t('{{GOOGLE_RATING}} from {{REVIEW_COUNT}} reviews on Google')}
+                        {t(copy.studio.reviewSummary)}
                       </p>
                     </div>
                     <ExternalLink
@@ -437,7 +471,7 @@ function MapSection() {
         {hasEmbed ? (
           <iframe
             src={siteConfig.location.mapEmbedUrl}
-            title={`Map showing the location of ${t(siteConfig.business.name)}`}
+            title={t(copy.map.frameTitle)}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
@@ -446,11 +480,7 @@ function MapSection() {
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
             <IconChip icon={MapPin} size="lg" tone="outline" strokeWidth={1.3} />
-            <p className="max-w-md text-ink-muted">
-              {t(
-                'Add your Google Maps embed URL to `location.mapEmbedUrl` in site.config.ts to display the studio location here.',
-              )}
-            </p>
+            <p className="max-w-md text-ink-muted">{copyConfig.developer.mapUnconfigured}</p>
             <p className="font-display text-lg text-ink">{t(formattedAddress())}</p>
           </div>
         )}
@@ -459,9 +489,7 @@ function MapSection() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 md:p-8">
           <div className="pointer-events-auto mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-(--radius-brand) border border-border bg-surface/95 p-6 text-center shadow-lift backdrop-blur-sm sm:flex-row sm:justify-between sm:text-left">
             <div>
-              <h2 className="font-display text-lg text-ink">
-                {t('{{BUSINESS_NAME}} — {{CITY}} Studio')}
-              </h2>
+              <h2 className="font-display text-lg text-ink">{t(copy.map.cardTitle)}</h2>
               <p className="mt-1.5 text-[0.86rem] text-ink-muted">{t(formattedAddress())}</p>
             </div>
             <Button asChild size="sm" className="shrink-0">
@@ -470,7 +498,7 @@ function MapSection() {
                 target={map.external ? '_blank' : undefined}
                 rel={map.external ? 'noopener noreferrer' : undefined}
               >
-                Get Directions
+                {copy.map.directions}
               </a>
             </Button>
           </div>

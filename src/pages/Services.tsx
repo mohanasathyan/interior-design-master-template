@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { services } from '@/data/services';
 import { breadcrumbSchema, serviceSchema, webPageSchema, type Crumb } from '@/lib/schema';
 import { telLink } from '@/lib/links';
@@ -34,6 +35,8 @@ const CRUMBS: Crumb[] = [
   { name: 'Services', path: routes.services },
 ];
 
+const copy = copyConfig.pages.services;
+
 export default function Services() {
   const page = siteConfig.seo.pages.services;
   const call = telLink();
@@ -52,9 +55,9 @@ export default function Services() {
       />
 
       <PageHero
-        eyebrow="Our Services"
-        title="Everything your space needs, from one accountable studio."
-        lead="Thirteen specialist services, all delivered in-house — design, materials, execution and finishing. No hand-offs to a third-party contractor, and one project manager from first sketch to handover."
+        eyebrow={copy.hero.eyebrow}
+        title={copy.hero.title}
+        lead={copy.hero.lead}
         image={siteConfig.media.pageHeaders.services}
         crumbs={CRUMBS}
       >
@@ -74,9 +77,9 @@ export default function Services() {
       {/* ================= Index rail ================= */}
       <Section tone="surface" spacing="sm">
         <SectionHeading
-          eyebrow="Service Index"
-          title="Jump straight to what you need."
-          lead="Every service below includes what is delivered, why it matters, an indicative timeline and a starting price band."
+          eyebrow={copy.index.eyebrow}
+          title={copy.index.title}
+          lead={copy.index.lead}
           maxWidth="max-w-2xl"
         />
 
@@ -105,7 +108,7 @@ export default function Services() {
           stagger={0.03}
           as="ul"
           className="mt-10 grid auto-rows-fr grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          aria-label="Services on this page"
+          aria-label={copy.index.listLabel}
         >
           {services.map((service, index) => (
             <RevealItem key={service.slug} as="li" preset="tight">
@@ -137,14 +140,8 @@ export default function Services() {
       <Section tone="muted" spacing="md">
         <Reveal preset="up">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <h2 className="font-display text-h2 text-ink">
-              {t('Not sure which service you need?')}
-            </h2>
-            <p className="max-w-xl text-lead text-ink-muted">
-              {t(
-                'Most projects combine several of the above. Describe your space and what is not working, and we will tell you exactly what it would take — including what you can safely leave out.',
-              )}
-            </p>
+            <h2 className="font-display text-h2 text-ink">{t(copy.closing.title)}</h2>
+            <p className="max-w-xl text-lead text-ink-muted">{t(copy.closing.lead)}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link to={routes.contact}>
@@ -156,7 +153,7 @@ export default function Services() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to={routes.projects}>See These Services Built</Link>
+                <Link to={routes.projects}>{copy.closing.secondaryAction}</Link>
               </Button>
             </div>
           </div>

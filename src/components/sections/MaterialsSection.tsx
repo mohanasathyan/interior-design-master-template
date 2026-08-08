@@ -3,6 +3,7 @@ import { BadgeCheck } from 'lucide-react';
 import { materials, materialsIntro } from '@/data/philosophy';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
@@ -26,6 +27,8 @@ import { routes } from '@/config/routes';
  * itself signals rigour.
  * ============================================================================
  */
+const copy = copyConfig.home.materials;
+
 export function MaterialsSection() {
   return (
     <Section id={homeSections.materials} tone="surface" spacing="lg">
@@ -50,11 +53,7 @@ export function MaterialsSection() {
 
           <Reveal preset="up" delay={0.15}>
             <div className="mt-8 flex items-start gap-3.5 border-l-2 border-accent pl-5">
-              <p className="text-[0.92rem] leading-relaxed text-ink-muted">
-                {t(
-                  'Every material below is named in your quotation, with a physical sample you can hold before you approve it. Nothing is substituted without your written consent.',
-                )}
-              </p>
+              <p className="text-[0.92rem] leading-relaxed text-ink-muted">{t(copy.note)}</p>
             </div>
           </Reveal>
         </div>
@@ -88,7 +87,7 @@ export function MaterialsSection() {
 
                     <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
                       <span className="text-[0.72rem] uppercase tracking-[0.14em] text-ink-muted">
-                        Used for: <span className="text-ink">{t(material.usedFor)}</span>
+                        {copy.usedFor} <span className="text-ink">{t(material.usedFor)}</span>
                       </span>
                     </div>
                   </div>
@@ -116,9 +115,7 @@ export function MaterialsSection() {
               className="mt-12 flex flex-col gap-4 bg-canvas sm:flex-row sm:items-center sm:justify-between"
             >
               <CardDescription className="max-w-md text-[0.95rem]">
-                {t(
-                  'Want the full specification for your project? We will send an itemised material schedule with your quotation.',
-                )}
+                {t(copy.scheduleOffer)}
               </CardDescription>
               <Button asChild size="md" className="shrink-0">
                 <Link to={routes.contact}>{siteConfig.cta.tertiary}</Link>

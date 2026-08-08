@@ -2,8 +2,10 @@ import { Quote, Star } from 'lucide-react';
 import { testimonials } from '@/data/testimonials';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { reviewLink } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Button } from '@/components/ui/button';
@@ -25,6 +27,8 @@ import { Button } from '@/components/ui/button';
  * same reassurance six times.
  * ============================================================================
  */
+const copy = copyConfig.home.testimonials;
+
 export function Testimonials() {
   if (!siteConfig.features.testimonials) return null;
 
@@ -34,9 +38,9 @@ export function Testimonials() {
   return (
     <Section id={homeSections.testimonials} tone="canvas" spacing="lg">
       <SectionHeading
-        eyebrow="Client Experiences"
-        title="What our clients say once the dust has settled."
-        lead="The reviews below were chosen because each one addresses something different — pricing, timelines, build quality and project management. Together they describe what it is actually like to work with us."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        lead={copy.lead}
         align="center"
         maxWidth="max-w-3xl"
       />
@@ -57,7 +61,7 @@ export function Testimonials() {
               {/* Rating */}
               <div
                 className="mt-5 flex gap-1"
-                aria-label={`${testimonial.rating} out of 5 stars`}
+                aria-label={format(copy.ratingLabel, { rating: testimonial.rating })}
               >
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Star
@@ -96,15 +100,13 @@ export function Testimonials() {
                 <Star key={index} className="size-4 fill-accent text-accent-strong" />
               ))}
             </span>
-            <span className="text-sm text-ink-muted">
-              {t('{{GOOGLE_RATING}} average from {{REVIEW_COUNT}} client reviews')}
-            </span>
+            <span className="text-sm text-ink-muted">{t(copy.summary)}</span>
           </div>
 
           {hasReviewLink && (
             <Button asChild variant="outline" size="md">
               <a href={review.href} target="_blank" rel="noopener noreferrer">
-                Read All Reviews on Google
+                {copy.readAll}
               </a>
             </Button>
           )}

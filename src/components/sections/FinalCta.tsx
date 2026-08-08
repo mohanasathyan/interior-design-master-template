@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, MessageCircle, Phone, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, MessageCircle, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { homeSections } from '@/data/navigation';
 import { telLink, whatsappLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
@@ -19,7 +20,10 @@ import { routes } from '@/config/routes';
  * Three principles are at work:
  *  1. Remove risk before asking. The three assurances below the buttons —
  *     free, no obligation, one working day — cost nothing to state and remove
- *     the three reasons someone hesitates at the last moment.
+ *     the three reasons someone hesitates at the last moment. They come from
+ *     `copy.config.ts`, and the About page hero renders the SAME list: a studio
+ *     that promises a one-day reply here and a two-day reply there has an
+ *     editing problem, not a copywriting one.
  *  2. Offer more than one channel. Some visitors will call, some will only
  *     ever message, and some want a form. All three are one tap away here.
  *  3. Be specific about what happens next. "Book a consultation" is vague;
@@ -27,11 +31,7 @@ import { routes } from '@/config/routes';
  * ============================================================================
  */
 
-const ASSURANCES = [
-  { icon: Sparkles, text: 'Free consultation and site visit' },
-  { icon: ShieldCheck, text: 'No obligation, no pressure' },
-  { icon: Clock, text: 'A reply within one working day' },
-];
+const copy = copyConfig.home.finalCta;
 
 export function FinalCta() {
   const call = telLink();
@@ -63,13 +63,13 @@ export function FinalCta() {
       <div className="relative mx-auto w-full max-w-[85rem] px-6 py-24 sm:px-8 md:py-32 lg:px-12 xl:px-16">
         <div className="max-w-3xl">
           <Reveal preset="tight">
-            <span className="eyebrow eyebrow--light">Start Your Project</span>
+            <span className="eyebrow eyebrow--light">{copy.eyebrow}</span>
           </Reveal>
 
           <Reveal preset="up" delay={0.06}>
             <h2 className="mt-6 font-display text-h1 text-contrast-ink">
-              {t('Let’s design a home you will')}{' '}
-              <span className="italic text-accent">never want to leave.</span>
+              {t(copy.title)}{' '}
+              <span className="italic text-accent">{t(copy.titleEmphasis)}</span>
             </h2>
           </Reveal>
 
@@ -79,11 +79,7 @@ export function FinalCta() {
           </Reveal>
 
           <Reveal preset="up" delay={0.12}>
-            <p className="mt-7 max-w-2xl text-lead text-contrast-ink/70">
-              {t(
-                'Tell us about your space, your timeline and your budget. We will come back with a clear view of what is achievable — and an honest opinion on where your money is best spent.',
-              )}
-            </p>
+            <p className="mt-7 max-w-2xl text-lead text-contrast-ink/70">{t(copy.lead)}</p>
           </Reveal>
 
           {/* ---------------- Actions ---------------- */}
@@ -126,7 +122,7 @@ export function FinalCta() {
             as="ul"
             className="mt-12 flex flex-col gap-4 border-t border-white/12 pt-9 sm:flex-row sm:flex-wrap sm:gap-x-10"
           >
-            {ASSURANCES.map((item) => {
+            {copyConfig.assurances.map((item) => {
               const Icon = item.icon;
               return (
                 <RevealItem key={item.text} as="li" className="flex items-center gap-3">

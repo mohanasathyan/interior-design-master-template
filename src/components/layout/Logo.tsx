@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { isFilled, t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { routes } from '@/config/routes';
 
@@ -108,7 +110,7 @@ export function Logo({
   return (
     <Link
       to={linkTo}
-      aria-label={`${wordmark} — go to homepage`}
+      aria-label={format(copyConfig.ui.logoHome, { name: wordmark })}
       className={cn(
         'inline-flex items-center transition-opacity duration-300 hover:opacity-75',
         className,

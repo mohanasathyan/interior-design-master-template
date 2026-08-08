@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Clock, MapPin, Maximize, MessageCircle, Wallet } from 'lucide-react';
 import type { Project } from '@/data/projects';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { whatsappLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { Img } from '@/components/common/Img';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +28,9 @@ import { routes } from '@/config/routes';
  * scroll lock, so the modal is fully keyboard- and screen-reader-correct.
  * ============================================================================
  */
+const copy = copyConfig.pages.projects.dialog;
+const cardCopy = copyConfig.pages.projects.card;
+
 export function ProjectDialog({
   project,
   onOpenChange,
@@ -37,20 +42,18 @@ export function ProjectDialog({
   /* Keep the panel mounted only while a project is selected. */
   if (!project) return null;
 
-  const whatsapp = whatsappLink(
-    `Hello {{BUSINESS_NAME}}, I saw the "${project.name}" project on your website and would like something similar. Could we discuss it?`,
-  );
+  const whatsapp = whatsappLink(format(copy.whatsappMessage, { project: project.name }));
 
   const facts = [
-    { icon: Maximize, label: 'Area', value: project.area },
-    { icon: Clock, label: 'Duration', value: project.duration },
-    { icon: Wallet, label: 'Budget band', value: project.budget },
-    { icon: Calendar, label: 'Completed', value: project.year },
+    { icon: Maximize, label: cardCopy.area, value: project.area },
+    { icon: Clock, label: cardCopy.duration, value: project.duration },
+    { icon: Wallet, label: copy.budget, value: project.budget },
+    { icon: Calendar, label: copy.completed, value: project.year },
   ];
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent closeLabel={`Close ${t(project.name)} details`}>
+      <DialogContent closeLabel={format(copy.closeLabel, { name: t(project.name) })}>
         <article className="flex flex-col">
           {/* ---------------- Image ---------------- */}
           <div className="relative">
@@ -86,14 +89,14 @@ export function ProjectDialog({
             <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
               <div className="lg:col-span-7">
                 <h3 className="text-[0.66rem] font-medium uppercase tracking-[0.22em] text-accent-strong">
-                  The brief
+                  {copy.brief}
                 </h3>
                 <DialogDescription className="mt-4 text-[1.02rem]">
                   {t(project.description)}
                 </DialogDescription>
 
                 <h3 className="mt-9 text-[0.66rem] font-medium uppercase tracking-[0.22em] text-accent-strong">
-                  Scope delivered
+                  {copy.scope}
                 </h3>
                 <ul className="mt-4 flex flex-wrap gap-2">
                   {project.scope.map((item) => (
@@ -131,9 +134,7 @@ export function ProjectDialog({
 
                 <div className="mt-7 rounded-(--radius-brand) border border-border bg-surface p-6">
                   <p className="text-[0.93rem] leading-relaxed text-ink-muted">
-                    {t(
-                      'Like this one? Tell us your room dimensions and we will come back with a realistic scope, timeline and budget for your space.',
-                    )}
+                    {t(copy.invitation)}
                   </p>
 
                   <div className="mt-6 flex flex-col gap-3">

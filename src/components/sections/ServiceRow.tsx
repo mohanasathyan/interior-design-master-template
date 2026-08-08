@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Clock, MessageCircle, Sparkles, Users, Wallet } from 'lucide-react';
 import type { Service } from '@/data/services';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { whatsappLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks';
 import { Container } from '@/components/common/Section';
@@ -32,14 +34,14 @@ import { routes } from '@/config/routes';
  * footer and home page can deep-link straight to any service.
  * ============================================================================
  */
+const copy = copyConfig.pages.services.row;
+
 export function ServiceRow({ service, index }: { service: Service; index: number }) {
   const Icon = service.icon;
   const flip = index % 2 === 1;
   /** True once the row is actually two columns — see the note on the reveal. */
   const sideBySide = useMediaQuery('(min-width: 64rem)');
-  const whatsapp = whatsappLink(
-    `Hello {{BUSINESS_NAME}}, I'd like to know more about your ${service.title} service.`,
-  );
+  const whatsapp = whatsappLink(format(copy.whatsappMessage, { service: service.title }));
 
   return (
     <section
@@ -118,7 +120,7 @@ export function ServiceRow({ service, index }: { service: Service; index: number
             {/* ---- What you get ---- */}
             <Reveal preset="up" delay={0.14}>
               <h3 className="mt-10 text-[0.66rem] font-medium uppercase tracking-[0.22em] text-ink">
-                What’s included
+                {copy.included}
               </h3>
             </Reveal>
 
@@ -149,7 +151,7 @@ export function ServiceRow({ service, index }: { service: Service; index: number
               <div className="mt-9 rounded-(--radius-brand) border border-border bg-surface-muted/60 p-6">
                 <h3 className="flex items-center gap-2.5 text-[0.66rem] font-medium uppercase tracking-[0.22em] text-ink">
                   <Sparkles className="size-3.5 text-accent-strong" strokeWidth={1.8} />
-                  Why it matters
+                  {copy.whyItMatters}
                 </h3>
                 <ul className="mt-4 flex flex-col gap-2.5">
                   {service.benefits.map((benefit) => (
@@ -177,9 +179,9 @@ export function ServiceRow({ service, index }: { service: Service; index: number
                * is a `token-safe` wrapping context — see `.token-safe`.
                */}
               <dl className="mt-8 grid gap-x-6 gap-y-6 border-t border-border pt-7 sm:grid-cols-3">
-                <Fact icon={Users} label="Ideal for" value={service.idealFor} />
-                <Fact icon={Clock} label="Typical timeline" value={service.timeline} />
-                <Fact icon={Wallet} label="Starting from" value={service.startingFrom} accent />
+                <Fact icon={Users} label={copy.idealFor} value={service.idealFor} />
+                <Fact icon={Clock} label={copy.timeline} value={service.timeline} />
+                <Fact icon={Wallet} label={copy.startingFrom} value={service.startingFrom} accent />
               </dl>
             </Reveal>
 
@@ -202,7 +204,7 @@ export function ServiceRow({ service, index }: { service: Service; index: number
                     rel={whatsapp.external ? 'noopener noreferrer' : undefined}
                   >
                     <MessageCircle className="size-4" strokeWidth={1.7} />
-                    Ask a question
+                    {copy.askAction}
                   </a>
                 </Button>
               </div>

@@ -5,6 +5,26 @@ client. Work top to bottom; nothing here needs a developer except step 0.
 
 ---
 
+## Where everything lives
+
+Four files and one folder hold **every** configurable value on the site. You
+never edit a component to clone this template — if you find yourself doing so,
+that is a bug in the template, not a step you missed.
+
+| File | What it holds |
+| --- | --- |
+| `src/config/site.config.ts` | The **business**: name, contact, address, hours, social, brand, colours, images, SEO, forms, analytics, feature switches, hero and CTA wording |
+| `src/config/copy.config.ts` | The **interface**: every section heading, button label, form field, placeholder example, system message and screen-reader announcement |
+| `src/config/shell.config.ts` | The three lines a visitor can read **before** the app loads (boot failsafe, `<noscript>`) |
+| `src/data/*.ts` | The **substance**: services, projects, FAQs, testimonials, stats, the founder's letter, the legal documents |
+| `/public/images/` | The photography |
+
+`src/config/routes.ts` is deliberately **not** on that list. It is application
+structure — URL paths, anchors, the sitemap location — and changing it changes
+what the router mounts, not what the client's site says.
+
+---
+
 ## 0 · Set up (once per client)
 
 ```bash
@@ -19,7 +39,7 @@ npm run dev
 ## 1 · Fill in `src/config/site.config.ts`
 
 Every item below is a `{{TOKEN}}` in that file. Search for the token, replace
-the value. The file is split into twelve numbered sections in this same order.
+the value. The file is split into fourteen numbered sections in this same order.
 
 ### Business identity
 - [ ] `{{BUSINESS_NAME}}` — trading name, e.g. `Studio Verde Interiors`
@@ -30,6 +50,26 @@ the value. The file is split into twelve numbered sections in this same order.
 - [ ] `{{GOOGLE_RATING}}` / `{{REVIEW_COUNT}}` — **leave as tokens unless the
       reviews are real.** Fabricated `aggregateRating` markup is a Google
       manual-action risk; the template omits the schema until both are filled.
+- [ ] `{{FOUNDER_NAME}}` / `{{FOUNDER_ROLE}}` / `{{FOUNDER_CREDENTIAL}}` —
+      in `business.founder`, **not** in `src/data/about.ts`. The founder is
+      named in three places (the About letter, the home page pull-quote
+      attribution and the founder photograph's alt text), so the identity has
+      one home and the long-form letter stays with the rest of the copy.
+
+### Headline commercial facts
+
+The `facts` block. Each of these is quoted in running prose in more than one
+place — an FAQ answer, a trust marker, a service row — so setting it once here
+updates every sentence that mentions it and no two pages can contradict each
+other.
+
+> **Include the unit in the value.** `'5 years'`, not `'5'`. They are dropped
+> straight into a sentence.
+
+- [ ] `{{WARRANTY_YEARS}}` — e.g. `5 years`
+- [ ] `{{PRICE_STARTING}}` — entry price for a single room
+- [ ] `{{PRICE_FULL_HOME}}` — typical full-home band
+- [ ] `{{TIMELINE_ROOM}}` / `{{TIMELINE_HOME}}` / `{{TIMELINE_DESIGN}}`
 
 ### Contact
 - [ ] `{{PHONE}}` — display format, e.g. `+91 98765 43210`
@@ -82,12 +122,41 @@ the value. The file is split into twelve numbered sections in this same order.
       the hero is self-hosted, so there is no CDN to crop a share card from and
       the fallback is the full-size hero at the wrong ratio.
 - [ ] `{{TWITTER_HANDLE}}` — including the `@`, or `''`
+- [ ] `seo.pages.*` — per-route `title` and `description`. There are **eight**
+      entries, including `privacy`, `terms` and `notFound`. The first five are
+      what appears in search results; the sitemap is generated from this object,
+      so a route with no entry never gets listed.
 
 ### Forms
 - [ ] `{{FORM_ENDPOINT}}` — Formspree / Web3Forms / Basin URL.
       Until this is set, the form runs in **demo mode** (validates, shows
       success, sends nothing). Test a real submission before handover.
-- [ ] `{{BUDGET_BAND_1..5}}` — the budget ranges shown in the form dropdown
+- [ ] `{{BUDGET_BAND_1..5}}` — the budget ranges shown in the form dropdown.
+      Each band is a **whole-string** placeholder, so write the entire label
+      including the currency: `Under ₹5 lakh`, `£10,000–£25,000`.
+- [ ] `forms.successMessage` — what the visitor reads after submitting
+
+### Analytics
+
+Leave both as tokens and the site ships with **no analytics at all** — no
+third-party script, no cookies, no `dataLayer`, no click listener, no console
+noise. Paste a real ID in and conversion tracking starts on the next load;
+nothing else changes.
+
+- [ ] `{{GA_MEASUREMENT_ID}}` — GA4, `G-XXXXXXXXXX`
+- [ ] `{{GTM_CONTAINER_ID}}` — Google Tag Manager, `GTM-XXXXXXX`
+
+> ⚠️ You normally want **one or the other.** GTM alone is the usual setup, with
+> the GA4 tag configured inside the container. Fill in both and you load both —
+> and if the container also reports to the same GA4 property, every enquiry is
+> counted twice.
+
+WhatsApp, click-to-call, email, the consultation and quote CTAs and contact-form
+submissions are tracked out of the box. There is no per-button wiring to do; see
+`src/lib/analytics.ts`.
+
+- [ ] **If you turn analytics on**, update the "Cookies and measurement" section
+      of `src/data/legal.ts` to name the tools you enabled.
 
 ### Features & CTAs
 - [ ] Toggle `floatingWhatsApp`, `floatingCall`, `backToTop`, `announcementBar`,
@@ -123,7 +192,70 @@ The before/after comparison on the home page, in `transformationCopy`:
 
 ---
 
-## 2 · Images
+## 2 · Site copy — `src/config/copy.config.ts`
+
+Everything the site *says* that is not already in `site.config.ts` or
+`src/data/`: section headings, button labels, form fields, placeholder examples,
+system messages and the text screen readers announce.
+
+Most of it is good as it stands and can ship unchanged. Four things are worth a
+deliberate pass.
+
+### The bits that matter most
+
+- [ ] **`form.fields.*.placeholder`** — the most locale-specific strings on the
+      site. They ship with an Indian name, an Indian dialling format, a carpet
+      area in square feet and a "3 BHK" flat. Good examples for that market and
+      obviously wrong for any other; a placeholder that does not match the
+      client's market quietly signals the site was built for somebody else.
+- [ ] **`assurances`** — the three risk-reversal lines shown under the About
+      hero *and* under the closing call to action. It is **one list rendered in
+      both places**, so the reply time you promise cannot drift between pages.
+      Only change it if the client can actually honour it.
+- [ ] **`home.stats` / `home.whyUs` / `home.process` …** — the section headings.
+      Rewrite in the client's voice; keep them short, because they are set at
+      display sizes and a long one wraps.
+- [ ] **`form.validation.*`** — written as help rather than as rebuke. Keep it
+      that way; this is the highest-value form on the site.
+
+### Two kinds of brace, and they are not the same
+
+```ts
+'Numbers verifiable across {{CITY}}.'   // a CONFIG value  — from site.config.ts
+'All {count} Services'                  // a RUNTIME value — supplied by the component
+```
+
+`{{TOKEN}}` is resolved from `site.config.ts` and **checked at build time** —
+`npm run build` fails and names the line if you use a key that has no home in
+the config. `{slot}` is a value the template only knows while rendering. The doc
+comment on every field names the slots it supports.
+
+You may move a `{slot}` anywhere inside its own sentence, or drop it. You cannot
+invent a new one without changing the component that supplies it.
+
+- [ ] Translating the site? `ui`, `floating` and `system` are short, dull and
+      load-bearing — they are what assistive technology reads. Translate them,
+      but do not make them clever.
+
+### Developer notices
+
+`developer.*` holds four scaffolding messages — the form's demo-mode banner, the
+map placeholder, the legal "not yet reviewed" notice. Each is gated on a config
+field still being a placeholder, so **filling that field in is what removes
+it**. None of them can reach a finished site.
+
+### Pre-app copy — `src/config/shell.config.ts`
+
+Three sentences a visitor can read before any JavaScript has run: the boot
+splash's ten-second failsafe and the `<noscript>` notice. They are injected into
+`index.html` at build time, so that file needs no editing either.
+
+- [ ] `noscript` — mentions "our design studio". Name the client, or leave it
+      generic; it is the only page a JavaScript-disabled visitor will ever see.
+
+---
+
+## 3 · Images
 
 The template ships with 39 curated stock interiors so it demos immediately.
 Replacing them is the single biggest quality jump for a real client.
@@ -196,7 +328,7 @@ image set still looks finished during a client review.
 
 ---
 
-## 3 · Content review — `src/data/`
+## 4 · Content review — `src/data/`
 
 - [ ] `services.ts` — remove services the client does not offer; fill the
       `{{TIMELINE_*}}` and `{{PRICE_*}}` tokens
@@ -211,15 +343,36 @@ image set still looks finished during a client review.
 - [ ] `testimonials.ts` — replace with real, attributed Google reviews
 - [ ] `faqs.ts` — fill `{{PRICE_STARTING}}`, `{{PRICE_FULL_HOME}}`,
       `{{TIMELINE_*}}`, `{{WARRANTY_YEARS}}`
-- [ ] `about.ts` — `{{FOUNDER_NAME}}`, `{{FOUNDER_ROLE}}`,
-      `{{FOUNDER_CREDENTIAL}}`, `{{MILESTONE_*}}`; rewrite the story in the
-      client's own voice
+- [ ] `about.ts` — `{{MILESTONE_*}}`; rewrite the story, the founder's letter,
+      the mission and the vision in the client's own voice.
+      The founder's **name, role and credential** are not here — they live in
+      `business.founder` in `site.config.ts`, because three separate places
+      quote them.
 - [ ] `stats.ts` — set the real numbers. Do not inflate them; they are the most
-      checkable claims on the site.
+      checkable claims on the site. This file also holds `trustMarkers`, the
+      six credibility lines in the marquee under the hero.
+- [ ] `philosophy.ts` — the design principles, the material specification and
+      the written promises
+- [ ] `differentiators.ts` / `process.ts` — the eight objection-handlers and the
+      six process stages
+- [ ] `legal.ts` — **the privacy policy and terms of service.**
+
+> ⚠️ **The legal documents are scaffolding, not legal advice.** They cover the
+> sections a design studio's policies normally need and wire the business name
+> and contact details to the config, but every jurisdiction differs. Have a
+> qualified adviser review them.
+>
+> While `legalMeta.lastUpdated` is still `{{LEGAL_LAST_UPDATED}}`, both pages
+> display a visible "not yet reviewed" notice. **Filling in that date is what
+> removes it** — so publishing unreviewed policies is a deliberate act rather
+> than an oversight.
+
+- [ ] `legalMeta.lastUpdated` — e.g. `12 March 2026`. Set this **after** the
+      review, not before.
 
 ---
 
-## 4 · Assets
+## 5 · Assets
 
 - [ ] Replace `public/favicon.svg` (or just change the letter inside it)
 - [ ] Regenerate the PNG icons from that SVG, keeping the filenames:
@@ -233,7 +386,7 @@ that value is still a placeholder.
 
 ---
 
-## 5 · Pre-launch verification
+## 6 · Pre-launch verification
 
 ```bash
 npm run lint     # type check
@@ -242,7 +395,15 @@ npm run preview  # walk every page at 375px, 768px and 1440px
 ```
 
 - [ ] The build prints **no** `seo.siteUrl is still a placeholder` warning
+- [ ] The build prints **no** `N of 29 tokens are still placeholders` warning.
+      That line names every field still outstanding — it is the go-live list.
 - [ ] Search `src/` for `{{` — no tokens should remain in rendered copy
+- [ ] Search the rendered pages for `{` — an unfilled `{count}` or `{name}`
+      means a `{slot}` in `copy.config.ts` was renamed or invented
+- [ ] Walk `/privacy` and `/terms` — the amber "not yet reviewed" notice must
+      be **gone**
+- [ ] Open the site with JavaScript disabled — the `<noscript>` notice should
+      name the client, not "our design studio"
 - [ ] `dist/index.html` — check the baked `<title>`, `og:title`, `og:image`
       and the hero `<link rel="preload">` all show real values
 - [ ] `dist/sitemap.xml` — every `<loc>` is an absolute URL on the live domain
@@ -275,7 +436,7 @@ npm run preview  # walk every page at 375px, 768px and 1440px
 
 ---
 
-## 6 · Deploy
+## 7 · Deploy
 
 | Host | Setting |
 | --- | --- |
@@ -288,4 +449,6 @@ Then:
 - [ ] Point the domain and force HTTPS
 - [ ] Submit `sitemap.xml` in Google Search Console
 - [ ] Connect the Google Business Profile and confirm NAP matches the footer exactly
-- [ ] Add analytics if required
+- [ ] Paste the GA4 or GTM ID into `analytics` in `site.config.ts` and redeploy
+      — then confirm a WhatsApp tap and a form submission both register as
+      conversions before handover

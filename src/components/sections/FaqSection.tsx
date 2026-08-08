@@ -3,6 +3,7 @@ import { ArrowRight, MessageCircle, MessageSquare, Phone } from 'lucide-react';
 import { faqs } from '@/data/faqs';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { telLink, whatsappLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
 import { Section, SectionHeading } from '@/components/common/Section';
@@ -36,6 +37,8 @@ import { routes } from '@/config/routes';
  * section eligible for the expandable FAQ rich result.
  * ============================================================================
  */
+const copy = copyConfig.home.faqs;
+
 export function FaqSection({
   tone = 'canvas',
   showContactPanel = true,
@@ -58,9 +61,9 @@ export function FaqSection({
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
             <SectionHeading
-              eyebrow="Frequently Asked"
-              title="The questions worth asking before you commit."
-              lead="Straight answers to what people actually ask us — including the one about cost. If yours is not here, we are happy to answer it directly."
+              eyebrow={copy.eyebrow}
+              title={copy.title}
+              lead={copy.lead}
               maxWidth="max-w-lg"
             />
 
@@ -73,21 +76,19 @@ export function FaqSection({
                 >
                   <IconChip icon={MessageSquare} size="lg" />
 
-                  <CardTitle className="mt-6 text-xl">{t('Still have a question?')}</CardTitle>
+                  <CardTitle className="mt-6 text-xl">{t(copy.panelTitle)}</CardTitle>
 
                   <GoldRule className="mt-4" />
 
                   <CardDescription className="mt-4 text-[0.93rem]">
-                    {t(
-                      'Speak to a designer directly — no scripts, no sales pitch. Most questions take five minutes to resolve.',
-                    )}
+                    {t(copy.panelLead)}
                   </CardDescription>
 
                   <div className="mt-7 flex w-full flex-col gap-3">
                     <Button asChild size="md" block>
                       <a href={call.href}>
                         <Phone className="size-4" strokeWidth={1.7} />
-                        {t('Call us: {{PHONE}}')}
+                        {t(copy.callAction)}
                       </a>
                     </Button>
                     <Button asChild size="md" variant="outline" block>
@@ -108,7 +109,7 @@ export function FaqSection({
                   to={routes.contact}
                   className="group mt-6 inline-flex w-full items-center justify-center gap-2.5 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-ink-muted transition-colors duration-300 hover:text-accent-strong"
                 >
-                  <span className="link-underline">Or send an enquiry instead</span>
+                  <span className="link-underline">{copy.formLink}</span>
                   <ArrowRight
                     className="size-3.5 transition-transform duration-500 ease-luxe group-hover:translate-x-1"
                     strokeWidth={1.7}

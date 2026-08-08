@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, m } from 'framer-motion';
 import { ArrowRight, Phone, SlidersHorizontal } from 'lucide-react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { projectCategories, projects, type Project } from '@/data/projects';
 import { studioStats } from '@/data/stats';
 import { breadcrumbSchema, webPageSchema, type Crumb } from '@/lib/schema';
 import { telLink } from '@/lib/links';
 import { t } from '@/lib/tokens';
+import { formatNodes } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks';
 import { Seo } from '@/components/common/Seo';
@@ -47,17 +49,28 @@ const CRUMBS: Crumb[] = [
   { name: 'Projects', path: routes.projects },
 ];
 
+const copy = copyConfig.pages.projects;
+
+/*
+ * The first entry in `projectCategories` is the catch-all, and it is DERIVED
+ * from the data file rather than repeated here as the literal 'All'. Renaming
+ * it — or translating it — is then a one-line change in `src/data/projects.ts`
+ * instead of a string that has to match in two places or the filter silently
+ * shows nothing.
+ */
+const ALL_CATEGORY = projectCategories[0];
+
 export default function Projects() {
   const page = siteConfig.seo.pages.projects;
   const call = telLink();
   const reduceMotion = usePrefersReducedMotion();
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(ALL_CATEGORY);
   const [selected, setSelected] = useState<Project | null>(null);
   const filterRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const visible = useMemo(
     () =>
-      activeCategory === 'All'
+      activeCategory === ALL_CATEGORY
         ? projects
         : projects.filter((project) => project.category === activeCategory),
     [activeCategory],
@@ -101,15 +114,15 @@ export default function Projects() {
       />
 
       <PageHero
-        eyebrow="Selected Work"
-        title="Projects we have designed, built and handed over."
-        lead="Homes, workplaces and retail spaces across {{CITY}}. Every project below lists its area, delivery time and budget band — so you can judge the fit before you get in touch."
+        eyebrow={copy.hero.eyebrow}
+        title={copy.hero.title}
+        lead={copy.hero.lead}
         image={siteConfig.media.pageHeaders.projects}
         crumbs={CRUMBS}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <Link to={routes.contact}>Start a Similar Project</Link>
+            <Link to={routes.contact}>{copy.hero.action}</Link>
           </Button>
           <Button asChild size="lg" variant="outlineInk">
             <a href={call.href}>
@@ -124,9 +137,9 @@ export default function Projects() {
       <Section tone="canvas" spacing="lg">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
-            eyebrow="Portfolio"
-            title="Real projects, real numbers."
-            lead="We publish the area, the timeline and the budget band for every project. Very few studios do — and it is the fastest way for you to tell whether we are the right fit."
+            eyebrow={copy.gallery.eyebrow}
+            title={copy.gallery.title}
+            lead={copy.gallery.lead}
             maxWidth="max-w-2xl"
           />
         </div>
@@ -136,12 +149,12 @@ export default function Projects() {
           <div className="mt-12 flex flex-col gap-5 border-y border-border py-6 md:flex-row md:items-center md:justify-between">
             <div
               role="radiogroup"
-              aria-label="Filter projects by category"
+              aria-label={copy.gallery.filterLabel}
               className="no-scrollbar -mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1"
             >
               <span className="mr-2 hidden shrink-0 items-center gap-2 text-[0.66rem] uppercase tracking-[0.18em] text-ink-muted md:flex">
                 <SlidersHorizontal className="size-3.5" strokeWidth={1.6} aria-hidden="true" />
-                Filter
+                {copy.gallery.filterHeading}
               </span>
 
               {projectCategories.map((category, index) => {
@@ -174,9 +187,17 @@ export default function Projects() {
               })}
             </div>
 
+            {/*
+              One editable sentence with two slots, rather than three fragments
+              spliced around JSX — so the wording, the order and the punctuation
+              are all the client's, and the emphasis stays attached to the
+              number it belongs to.
+            */}
             <p aria-live="polite" className="shrink-0 text-[0.78rem] text-ink-muted">
-              Showing <span className="text-ink tabular-nums">{visible.length}</span> of{' '}
-              <span className="tabular-nums">{projects.length}</span> projects
+              {formatNodes(copy.gallery.resultCount, {
+                visible: <span className="text-ink tabular-nums">{visible.length}</span>,
+                total: <span className="tabular-nums">{projects.length}</span>,
+              })}
             </p>
           </div>
         </Reveal>
@@ -205,9 +226,7 @@ export default function Projects() {
         </div>
 
         {visible.length === 0 && (
-          <p className="mt-16 text-center text-ink-muted">
-            {t('No projects in this category yet — but we would be glad to discuss yours.')}
-          </p>
+          <p className="mt-16 text-center text-ink-muted">{t(copy.gallery.empty)}</p>
         )}
       </Section>
 
@@ -216,8 +235,8 @@ export default function Projects() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">
             <SectionHeading
-              eyebrow="By the Numbers"
-              title="What our track record looks like."
+              eyebrow={copy.numbers.eyebrow}
+              title={copy.numbers.title}
               tone="light"
               maxWidth="max-w-md"
             />
@@ -237,14 +256,8 @@ export default function Projects() {
       <Section tone="surface" spacing="md">
         <Reveal preset="up">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <h2 className="font-display text-h2 text-ink">
-              {t('Want something like one of these?')}
-            </h2>
-            <p className="max-w-2xl text-lead text-ink-muted">
-              {t(
-                'Send us the project that caught your eye along with your floor plan or room dimensions. We will come back with a realistic scope, timeline and budget for your space.',
-              )}
-            </p>
+            <h2 className="font-display text-h2 text-ink">{t(copy.closing.title)}</h2>
+            <p className="max-w-2xl text-lead text-ink-muted">{t(copy.closing.lead)}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link to={routes.contact}>
@@ -256,7 +269,7 @@ export default function Projects() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to={routes.services}>Explore Our Services</Link>
+                <Link to={routes.services}>{copy.closing.secondaryAction}</Link>
               </Button>
             </div>
           </div>

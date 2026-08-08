@@ -136,19 +136,18 @@
     <div id="root">
       <div class="boot-splash" id="boot-splash">
         <div class="boot-splash__mark" aria-hidden="true"></div>
-        <p class="boot-splash__fallback">
-          This is taking longer than expected.
-          <a href="/">Reload the page</a>
-        </p>
+        <!--
+          Copy injected at build time from src/config/shell.config.ts, for the
+          same reason as the metadata above: cloning the template must never
+          mean editing this file. See `shellHtmlPlugin` in vite.config.ts.
+        -->
+        <p class="boot-splash__fallback"><!-- SHELL:BOOT_FALLBACK --></p>
       </div>
     </div>
 
     <noscript>
       <div style="padding: 3rem; font-family: system-ui, sans-serif; color: #222">
-        <p>
-          This website needs JavaScript to display fully. Please call or email our design studio and
-          we will be glad to help.
-        </p>
+        <p><!-- SHELL:NOSCRIPT --></p>
       </div>
     </noscript>
 

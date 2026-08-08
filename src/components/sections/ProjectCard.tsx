@@ -1,6 +1,8 @@
 import { ArrowUpRight, Clock, Maximize, MapPin, Wallet } from 'lucide-react';
 import type { Project } from '@/data/projects';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { cn } from '@/lib/utils';
 import { Img } from '@/components/common/Img';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +23,8 @@ import { Badge } from '@/components/ui/badge';
  * never happen.
  * ============================================================================
  */
+
+const copy = copyConfig.pages.projects.card;
 
 /** Aspect ratio per masonry footprint — the variation is what makes it read as a gallery. */
 const RATIO: Record<Project['span'], string> = {
@@ -48,7 +52,10 @@ export function ProjectCard({
         type="button"
         onClick={() => onSelect(project)}
         aria-haspopup="dialog"
-        aria-label={`${t(project.name)} — ${t(project.category)} project. View project details.`}
+        aria-label={format(copy.openLabel, {
+          name: t(project.name),
+          category: t(project.category),
+        })}
         className="block w-full cursor-pointer text-left overflow-hidden rounded-(--radius-brand) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
         {/* ---------------- Image ---------------- */}
@@ -102,9 +109,9 @@ export function ProjectCard({
             </p>
 
             <dl className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/20 pt-4 text-white/80">
-              <MetaItem icon={Maximize} label="Area" value={project.area} tone="light" />
-              <MetaItem icon={Clock} label="Duration" value={project.duration} tone="light" />
-              <MetaItem icon={Wallet} label="Budget" value={project.budget} tone="light" />
+              <MetaItem icon={Maximize} label={copy.area} value={project.area} tone="light" />
+              <MetaItem icon={Clock} label={copy.duration} value={project.duration} tone="light" />
+              <MetaItem icon={Wallet} label={copy.budget} value={project.budget} tone="light" />
             </dl>
           </div>
         </div>
@@ -133,9 +140,9 @@ export function ProjectCard({
 
           {/* The permanent counterpart: shown wherever the hover panel is not. */}
           <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-4 [@media(pointer:fine)]:md:hidden">
-            <MetaItem icon={Maximize} label="Area" value={project.area} />
-            <MetaItem icon={Clock} label="Duration" value={project.duration} />
-            <MetaItem icon={Wallet} label="Budget" value={project.budget} />
+            <MetaItem icon={Maximize} label={copy.area} value={project.area} />
+            <MetaItem icon={Clock} label={copy.duration} value={project.duration} />
+            <MetaItem icon={Wallet} label={copy.budget} value={project.budget} />
           </dl>
         </div>
       </button>

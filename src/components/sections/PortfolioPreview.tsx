@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { featuredProjects, projects, type Project } from '@/data/projects';
 import { homeSections } from '@/data/navigation';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
+import { format } from '@/lib/copy';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Button } from '@/components/ui/button';
@@ -25,6 +27,8 @@ import { routes } from '@/config/routes';
  * template.
  * ============================================================================
  */
+const copy = copyConfig.home.portfolio;
+
 export function PortfolioPreview() {
   /** The project whose case study is open, or `null`. */
   const [selected, setSelected] = useState<Project | null>(null);
@@ -33,16 +37,16 @@ export function PortfolioPreview() {
     <Section id={homeSections.portfolio} tone="canvas" spacing="lg">
       <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeading
-          eyebrow="Selected Work"
-          title="Spaces we have designed, built and handed over."
-          lead="Every project below was delivered end to end by our own team. Area, timeline and budget band are published for each one — so you can judge the fit before you ever pick up the phone."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          lead={copy.lead}
           maxWidth="max-w-2xl"
         />
 
         <Reveal preset="up" delay={0.15} className="shrink-0">
           <Button asChild variant="outline" size="md">
             <Link to={routes.projects}>
-              View All {projects.length} Projects
+              {format(copy.viewAll, { count: projects.length })}
               <ArrowRight
                 className="size-4 transition-transform duration-500 ease-luxe group-hover/btn:translate-x-1"
                 strokeWidth={1.7}
@@ -66,17 +70,13 @@ export function PortfolioPreview() {
       {/* Closing prompt — invites a conversation rather than another click. */}
       <Reveal preset="up">
         <div className="mt-14 flex flex-col items-center gap-5 border-t border-border pt-12 text-center">
-          <p className="max-w-2xl text-lead text-ink-muted">
-            {t(
-              'Seen something close to what you have in mind? Send us the reference and the dimensions of your space — we will tell you what it would take to achieve it.',
-            )}
-          </p>
+          <p className="max-w-2xl text-lead text-ink-muted">{t(copy.closing)}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link to={routes.contact}>Discuss Your Project</Link>
+              <Link to={routes.contact}>{copy.discuss}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to={routes.projects}>Browse the Full Gallery</Link>
+              <Link to={routes.projects}>{copy.browse}</Link>
             </Button>
           </div>
         </div>

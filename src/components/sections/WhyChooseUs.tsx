@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { differentiators } from '@/data/differentiators';
 import { homeSections } from '@/data/navigation';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { t } from '@/lib/tokens';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal, RevealGroup } from '@/components/common/Reveal';
@@ -26,6 +27,8 @@ import { routes } from '@/config/routes';
  * so all three grids stay typographically identical.
  * ============================================================================
  */
+const copy = copyConfig.home.whyUs;
+
 export function WhyChooseUs() {
   return (
     <Section
@@ -35,8 +38,8 @@ export function WhyChooseUs() {
       backdrop={siteConfig.media.backdrops.soft}
     >
       <SectionHeading
-        eyebrow="Why Choose Us"
-        title="Every reason an interior project goes wrong — and how we prevent it."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
         align="center"
         maxWidth="max-w-3xl"
       />
@@ -47,12 +50,8 @@ export function WhyChooseUs() {
       */}
       <Reveal preset="up" delay={0.12}>
         <p className="mx-auto mt-6 max-w-3xl text-center text-lead text-ink-muted">
-          {t(
-            'Most people approaching an interior studio are carrying the same four worries: the cost will climb, the timeline will slip, the finish will not match the render, and nobody will pick up the phone afterwards.',
-          )}{' '}
-          <span className="text-accent-strong">
-            {t('Here is precisely how we handle each of them.')}
-          </span>
+          {t(copy.lead)}{' '}
+          <span className="text-accent-strong">{t(copy.leadEmphasis)}</span>
         </p>
       </Reveal>
 
@@ -75,11 +74,7 @@ export function WhyChooseUs() {
       <Reveal preset="up">
         <div className="mt-14 flex flex-col items-center gap-6 text-center">
           <span aria-hidden="true" className="size-1.5 rotate-45 bg-accent/60" />
-          <p className="max-w-2xl text-ink-muted">
-            {t(
-              'Have a project in mind? A short conversation is usually enough to tell you what is realistic for your space and your budget.',
-            )}
-          </p>
+          <p className="max-w-2xl text-ink-muted">{t(copy.closing)}</p>
           <Button asChild size="lg">
             <Link to={routes.contact}>
               {siteConfig.cta.primary}

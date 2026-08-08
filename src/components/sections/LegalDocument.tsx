@@ -1,6 +1,8 @@
 import { AlertCircle } from 'lucide-react';
 import { legalMeta, type LegalDocumentContent } from '@/data/legal';
+import { copyConfig } from '@/config/copy.config';
 import { isFilled, t } from '@/lib/tokens';
+import { formatNodes } from '@/lib/copy';
 import type { Crumb } from '@/lib/schema';
 import { Section } from '@/components/common/Section';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
@@ -23,6 +25,8 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
  * heading needs clearance of its own or the bar covers it.
  * ============================================================================
  */
+const notice = copyConfig.developer.legalUnreviewed;
+
 export function LegalDocument({
   content,
   crumbs,
@@ -50,7 +54,8 @@ export function LegalDocument({
         `src/data/legal.ts`.
       */}
       <p className="mt-8 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-ink-muted">
-        Last updated: <span className="text-ink">{t(legalMeta.lastUpdated)}</span>
+        {copyConfig.pages.legal.lastUpdated}{' '}
+        <span className="text-ink">{t(legalMeta.lastUpdated)}</span>
       </p>
 
       {!reviewed && (
@@ -63,13 +68,17 @@ export function LegalDocument({
             className="mt-0.5 size-4 shrink-0 text-accent-strong"
             strokeWidth={1.8}
           />
+          {/*
+            The file and field names are supplied as `{slots}` rather than
+            written into the sentence, so they keep their code styling while the
+            surrounding prose stays one editable string in `copy.config.ts`.
+          */}
           <p className="text-[0.86rem] leading-relaxed text-ink">
-            <span className="font-medium">Template text — not yet reviewed.</span> This document is
-            structured scaffolding, not legal advice. Edit it in{' '}
-            <code className="text-accent-strong">src/data/legal.ts</code>, have a qualified adviser
-            check it against the law where the studio operates, then set{' '}
-            <code className="text-accent-strong">legalMeta.lastUpdated</code> to publish. Setting
-            that date removes this notice.
+            <span className="font-medium">{notice.label}</span>{' '}
+            {formatNodes(notice.detail, {
+              file: <code className="text-accent-strong">src/data/legal.ts</code>,
+              field: <code className="text-accent-strong">legalMeta.lastUpdated</code>,
+            })}
           </p>
         </div>
       )}

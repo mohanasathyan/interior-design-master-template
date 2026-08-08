@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { siteConfig } from '@/config/site.config';
+import { copyConfig } from '@/config/copy.config';
 import { mailLink, telLink, whatsappLink } from '@/lib/links';
 import { isFilled, t } from '@/lib/tokens';
 import { routes } from '@/config/routes';
@@ -89,22 +90,25 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const hasPhone = isFilled(siteConfig.contact.phone);
     const hasEmail = isFilled(siteConfig.contact.email);
     const hasWhatsapp = isFilled(siteConfig.contact.whatsapp);
-    const businessName = isFilled(siteConfig.business.name) ? t(siteConfig.business.name) : null;
+    const named = isFilled(siteConfig.business.name);
+    const copy = copyConfig.system.error;
 
     return (
       <main className="grid min-h-svh place-items-center bg-canvas px-6 py-16">
         <div className="w-full max-w-lg text-center">
           <span className="text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-accent-strong">
-            Something went wrong
+            {copy.eyebrow}
           </span>
 
           <h1 className="mt-5 font-display text-[2rem] leading-tight text-ink sm:text-[2.5rem]">
-            This page didn’t load properly.
+            {copy.title}
           </h1>
 
+          {/* Two whole sentences rather than one with a spliced-in clause: the
+              named version reads differently, not just longer, and a client
+              rewriting either must be able to see the whole thing. */}
           <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-muted">
-            Sorry — that is our fault, not yours. Reloading usually fixes it. If it does not,
-            {businessName ? ` ${businessName} would still love to hear from you.` : ' please get in touch directly.'}
+            {named ? t(copy.bodyNamed) : copy.body}
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -113,7 +117,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               onClick={this.handleRetry}
               className="inline-flex h-12 w-full items-center justify-center bg-accent-button px-7 text-[0.76rem] font-medium uppercase tracking-[0.18em] text-accent-contrast transition-colors duration-300 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent sm:w-auto"
             >
-              Reload the page
+              {copy.retry}
             </button>
 
             {/* A plain anchor, not a router link — see the note above. */}
@@ -121,14 +125,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               href={routes.home}
               className="inline-flex h-12 w-full items-center justify-center border border-ink/25 px-7 text-[0.76rem] font-medium uppercase tracking-[0.18em] text-ink transition-colors duration-300 hover:border-ink hover:bg-ink hover:text-canvas focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent sm:w-auto"
             >
-              Back to home
+              {copy.home}
             </a>
           </div>
 
           {(hasPhone || hasEmail || hasWhatsapp) && (
             <div className="mt-10 border-t border-border pt-8">
               <p className="text-[0.62rem] font-medium uppercase tracking-[0.22em] text-ink-muted">
-                Reach us directly
+                {copy.contactHeading}
               </p>
               <ul className="mt-4 flex flex-col items-center gap-2.5 text-[0.95rem] sm:flex-row sm:justify-center sm:gap-7">
                 {hasPhone && (
@@ -159,7 +163,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                       rel={whatsapp.external ? 'noopener noreferrer' : undefined}
                       className="text-ink transition-colors duration-300 hover:text-accent-strong"
                     >
-                      WhatsApp
+                      {copy.whatsapp}
                     </a>
                   </li>
                 )}
