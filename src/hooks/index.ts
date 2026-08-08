@@ -171,13 +171,23 @@ export function useActiveSection(ids: string[]): string | null {
  */
 export function useCopyToClipboard(resetAfter = 2000) {
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<number | undefined>(undefined);
+
+  /* Drop a pending reset on unmount so it cannot fire against a gone component. */
+  useEffect(() => () => window.clearTimeout(resetTimer.current), []);
 
   const copy = useCallback(
     async (text: string) => {
       try {
         await navigator.clipboard.writeText(text);
         setCopied(true);
-        window.setTimeout(() => setCopied(false), resetAfter);
+        /*
+         * Restart the countdown rather than adding a second one. Without the
+         * clear, a copy at t=1500ms inherits the first timer's t=2000ms
+         * deadline and the "Copied" confirmation vanishes after 500ms.
+         */
+        window.clearTimeout(resetTimer.current);
+        resetTimer.current = window.setTimeout(() => setCopied(false), resetAfter);
         return true;
       } catch {
         return false;
